@@ -7,55 +7,58 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
-  Button
+  Button,
+  ActivityIndicator
 } from 'react-native';
-import React, {useState, useCallback} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {Colors, Fonts, Sizes, screenHeight} from '../../constants/styles';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
+import {Overlay} from '@rneui/themed';
 import BottomSheet from 'react-native-simple-bottom-sheet';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useFocusEffect} from '@react-navigation/native';
 import MyStatusBar from '../../components/myStatusBar';
+import { useLocation } from '../../hooks/useLocation';
 
-const nearestCabs = [
+const distribuidoresCercanos = [
   {
     id: '1',
     coordinate: {
-      latitude: 22.650329,
-      longitude: 88.361861,
+      latitude: -0.19187,
+      longitude: -78.49251166666667,
     },
   },
   {
     id: '2',
     coordinate: {
-      latitude: 22.624979,
-      longitude: 88.38007,
+      latitude: -0.20187,
+      longitude: -78.49551166666667,
     },
   },
   {
     id: '3',
     coordinate: {
-      latitude: 22.658567,
-      longitude: 88.441909,
+      latitude: -0.19187,
+      longitude: -78.49451166666667,
     },
   },
   {
     id: '4',
     coordinate: {
-      latitude: 22.688345,
-      longitude: 88.418891,
+      latitude: -0.19587,
+      longitude: -78.49451166666667,
     },
   },
   {
     id: '5',
     coordinate: {
-      latitude: 22.678525,
-      longitude: 88.460777,
+      latitude: -0.18,
+      longitude: -78.49451166666667,
     },
   },
 ];
 
-const nearestLocations = [
+/* const nearestLocations = [
   {
     id: '1',
     address: 'Bailey Drive, Fredericton',
@@ -66,9 +69,32 @@ const nearestLocations = [
     address: 'Belleville St, Victoria',
     addressDetail: '225 Belleville St, Victoria, BC V8V 1X1',
   },
-];
+]; */
 
 const HomeScreen = ({navigation}) => {
+  //const [ distribuidoresCercanos, setDistribuidoresCercanos] = useState([]);
+  const { hasLocation, initialPosition } = useLocation();
+
+  /* useEffect(() => {
+    let distribuidores = [];
+    for (let index = 1; index < 5; index++) {
+      let distribuidor =  {
+        id: index,
+        coordinate: {
+          latitude: initialPosition.latitude + randomIntFromInterval(1, 200),
+          longitude: initialPosition.longitude + randomIntFromInterval(1, 200),
+        },
+      }
+      distribuidores.push(distribuidor);
+    }
+    setDistribuidoresCercanos(distribuidores);
+    console.log(distribuidores)
+  }, []) */
+  
+  function randomIntFromInterval(min, max) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min)
+  }
+  
   const backAction = () => {
     if (Platform.OS === 'ios') {
       navigation.addListener('beforeRemove', e => {
@@ -98,17 +124,42 @@ const HomeScreen = ({navigation}) => {
     }, 1000);
   }
 
+  function loadingDialog() {
+    return (
+      <Overlay isVisible={!hasLocation} overlayStyle={styles.dialogStyle}>
+        <ActivityIndicator
+          size={56}
+          color={Colors.primaryColor}
+          style={{
+            alignSelf: 'center',
+            transform: [{scale: Platform.OS == 'ios' ? 2 : 1}],
+          }}
+        />
+        <Text
+          style={{
+            marginTop: Sizes.fixPadding * 2.0,
+            textAlign: 'center',
+            ...Fonts.grayColor14Regular,
+          }}>
+          Espera, te estamos ubicando...
+        </Text>
+      </Overlay>
+    );
+  }
+
   const [backClickCount, setBackClickCount] = useState(0);
 
   return (
+    
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
       <MyStatusBar />
       <View style={{flex: 1}}>
-        {nearestCabsInfo()}
+        {displayMap()}
         {currentLocationWithMenuIcon()}
         {nearestLocationsSheet()}
       </View>
       {exitInfo()}
+      {loadingDialog()}
     </View>
   );
 
@@ -170,7 +221,7 @@ const HomeScreen = ({navigation}) => {
         <Button
           title="Pedir Ahora"
           color={Colors.primaryColor}
-          accessibilityLabel="Learn more about this purple button"
+          accessibilityLabel="Clic para solicitar"
         />
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -240,38 +291,30 @@ const HomeScreen = ({navigation}) => {
     );
   }
 
-  function nearestCabsInfo() {
-    const userCurrentLocation = {
-      latitude: 22.644066,
-      longitude: 88.42122,
-    };
-    const rotationsList = [120, 180, 120, 90, 180];
+  function displayMap() {
     return (
       <View style={{flex: 1}}>
         <MapView
           region={{
-            latitude: 22.644066,
-            longitude: 88.42122,
+            latitude: initialPosition.latitude,
+            longitude: initialPosition.longitude,
             latitudeDelta: 0.15,
             longitudeDelta: 0.15,
           }}
           style={{height: '100%'}}
-          provider={PROVIDER_GOOGLE}
-          mapType="terrain">
-          {nearestCabs.map((item, index) => (
+          provider={PROVIDER_GOOGLE}>
+          {distribuidoresCercanos.map((item, index) => (
             <Marker key={`${item.id}`} coordinate={item.coordinate}>
               <Image
                 source={require('../../assets/images/icons/cilindro_amarillo.png')}
                 style={{
                   width: 23.0,
                   height: 43.0,
-                  /*  resizeMode: 'contain', */
-                  /* transform: [{rotate: `${rotationsList[index]}deg`}], */
                 }}
               />
             </Marker>
           ))}
-          <Marker coordinate={userCurrentLocation}>
+          <Marker coordinate={initialPosition}>
             {/* <Image
               source={require('../../assets/images/icons/current_marker.png')}
               style={{width: 70.0, height: 70.0, resizeMode: 'contain'}}
@@ -286,7 +329,7 @@ const HomeScreen = ({navigation}) => {
     return backClickCount == 1 ? (
       <View style={styles.exitInfoWrapStyle}>
         <Text style={{...Fonts.whiteColor15SemiBold}}>
-          Press Back Once Again to Exit
+          Presiona otra vez para salir de la app
         </Text>
       </View>
     ) : null;
