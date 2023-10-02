@@ -10,25 +10,32 @@ export const useLocation = () => {
         longitude: 0
     })
 
-    useEffect(() => {
+    const getCurrentLocation = (): Promise<Location> => {
+      return new Promise( (resolve, reject) => {
         Geolocation.getCurrentPosition(
           info => {
-            setInitialPosition({
+            resolve({
                 latitude: info.coords.latitude,
                 longitude: info.coords.longitude
-            })
-            console.log('Posición inicial', initialPosition);
-            sethasLocation(true);
+            });
           },
-          error => { console.log(error)},{
+          error => { reject(error)},{
             enableHighAccuracy: true
-          }
-          
-          );
-      }, [])
+          });
+      });
+    } 
+
+    useEffect(() => {
+      getCurrentLocation().then( location => {
+        setInitialPosition(location);
+        sethasLocation(true);
+        console.log(location);
+      });
+    }, [])
 
   return {
     hasLocation,
-    initialPosition
+    initialPosition,
+    getCurrentLocation
   }
 }

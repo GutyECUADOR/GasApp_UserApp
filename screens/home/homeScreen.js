@@ -10,7 +10,7 @@ import {
   Button,
   ActivityIndicator
 } from 'react-native';
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {Colors, Fonts, Sizes, screenHeight} from '../../constants/styles';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import {Overlay} from '@rneui/themed';
@@ -72,29 +72,20 @@ const distribuidoresCercanos = [
 ]; */
 
 const HomeScreen = ({navigation}) => {
-  //const [ distribuidoresCercanos, setDistribuidoresCercanos] = useState([]);
-  const { hasLocation, initialPosition } = useLocation();
+  const { hasLocation, initialPosition, getCurrentLocation } = useLocation();
+  const mapViewRef = useRef();
 
-  /* useEffect(() => {
-    let distribuidores = [];
-    for (let index = 1; index < 5; index++) {
-      let distribuidor =  {
-        id: index,
-        coordinate: {
-          latitude: initialPosition.latitude + randomIntFromInterval(1, 200),
-          longitude: initialPosition.longitude + randomIntFromInterval(1, 200),
-        },
+  const centerPosition = async () => {
+    const { latitude, longitude } = await getCurrentLocation()
+    console.log('Centrando posición', latitude, longitude);
+    mapViewRef.current?.animateCamera({
+      center: {
+          latitude,
+          longitude
       }
-      distribuidores.push(distribuidor);
-    }
-    setDistribuidoresCercanos(distribuidores);
-    console.log(distribuidores)
-  }, []) */
-  
-  function randomIntFromInterval(min, max) { // min and max included 
-    return Math.floor(Math.random() * (max - min + 1) + min)
-  }
-  
+    })
+  };
+
   const backAction = () => {
     if (Platform.OS === 'ios') {
       navigation.addListener('beforeRemove', e => {
@@ -166,7 +157,7 @@ const HomeScreen = ({navigation}) => {
   function currentLocationIcon() {
     return (
       <View style={styles.currentLocationIconWrapStyle}>
-        <MaterialIcons name="my-location" size={30} color="black" />
+        <MaterialIcons onPress={centerPosition} name="my-location" size={30} color="black" />
       </View>
     );
   }
@@ -219,6 +210,7 @@ const HomeScreen = ({navigation}) => {
         wrapperStyle={{...styles.bottomSheetWrapStyle}}>
        {/*  {searchBar()} */}
         <Button
+          onPress={centerPosition}
           title="Pedir Ahora"
           color={Colors.primaryColor}
           accessibilityLabel="Clic para solicitar"
@@ -295,6 +287,7 @@ const HomeScreen = ({navigation}) => {
     return (
       <View style={{flex: 1}}>
         <MapView
+          ref={ (element) => mapViewRef.current = element}
           region={{
             latitude: initialPosition.latitude,
             longitude: initialPosition.longitude,
