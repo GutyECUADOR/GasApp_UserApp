@@ -20,6 +20,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import MyStatusBar from '../../components/myStatusBar';
 import { useLocation } from '../../hooks/useLocation';
 
+
 const distribuidoresCercanos = [
   {
     id: '1',
@@ -72,7 +73,8 @@ const distribuidoresCercanos = [
 ]; */
 
 const HomeScreen = ({navigation}) => {
-  const { hasLocation, initialPosition, getCurrentLocation } = useLocation();
+  
+  const { hasLocation, initialPosition, getCurrentLocation, address } = useLocation();
   const mapViewRef = useRef();
 
   const centerPosition = async () => {
@@ -192,7 +194,7 @@ const HomeScreen = ({navigation}) => {
               flex: 1,
               ...Fonts.blackColor15SemiBold,
             }}>
-            Alemania 899 y  Mariana de Jesus
+            {address} 
           </Text>
         </View>
       </View>
