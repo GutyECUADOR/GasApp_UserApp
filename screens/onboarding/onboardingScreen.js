@@ -25,23 +25,23 @@ const OnboardingScreen = ({navigation}) => {
     {
       id: '1',
       onboardingImage: require('../../assets/images/onboarding/onboarding1.png'),
-      onboardingTitle: 'Select Location',
+      onboardingTitle: 'Selecciona tu ubicación',
       onboardingDescription:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit Nunc, purus quis mi nulla vehicula',
+        'Indicanos en el mapa en que ubicación aproximada te encuentras.',
     },
     {
       id: '2',
-      onboardingImage: require('../../assets/images/onboarding/onboarding2.png'),
-      onboardingTitle: 'Choose Your Ride',
+      onboardingImage: require('../../assets/images/onboarding/step2.jpg'),
+      onboardingTitle: 'Espera el delivery del gas',
       onboardingDescription:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit Nunc, purus quis mi nulla vehicula',
+        'Uno de nuestros distribuidores autorizados llegara a tu ubicación y te entregará tu cilindro',
     },
     {
       id: '3',
-      onboardingImage: require('../../assets/images/onboarding/onboarding3.png'),
-      onboardingTitle: 'Enjoy Your Ride',
+      onboardingImage: require('../../assets/images/app_icon.png'),
+      onboardingTitle: 'Disfruta tu cilintro y ahorra tiempo',
       onboardingDescription:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit Nunc, purus quis mi nulla vehicula',
+        'Confirma que el delivery ha llegado y recibe tu cilindro. Realiza el pago correspondiente y puntua la app',
     },
   ];
 
@@ -99,7 +99,7 @@ const OnboardingScreen = ({navigation}) => {
         <Text
           onPress={() => (currentScreen == 2 ? null : navigation.push('Login'))}
           style={{...Fonts.primaryColor16Bold}}>
-          {currentScreen == 2 ? '' : 'Skip'}
+          {currentScreen == 2 ? '' : 'Omitir'}
         </Text>
         <TouchableOpacity
           activeOpacity={0.8}

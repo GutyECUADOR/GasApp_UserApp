@@ -7,6 +7,7 @@ import {
   Image,
   BackHandler,
   Platform,
+  TextInput
 } from 'react-native';
 import React, {useState, useCallback} from 'react';
 import {Colors, Fonts, Sizes, screenHeight} from '../../constants/styles';
@@ -73,7 +74,7 @@ const LoginScreen = ({navigation}) => {
           navigation.push('Home');
         }}
         style={styles.buttonStyle}>
-        <Text style={{...Fonts.whiteColor18Bold}}>Continue</Text>
+        <Text style={{...Fonts.whiteColor18Bold}}>Iniciar Sesión</Text>
       </TouchableOpacity>
     );
   }
@@ -82,7 +83,7 @@ const LoginScreen = ({navigation}) => {
     return backClickCount == 1 ? (
       <View style={styles.exitInfoWrapStyle}>
         <Text style={{...Fonts.whiteColor15SemiBold}}>
-          Press Back Once Again to Exit
+          Presiona 2 veces para salir
         </Text>
       </View>
     ) : null;
@@ -95,9 +96,24 @@ const LoginScreen = ({navigation}) => {
           marginHorizontal: Sizes.fixPadding * 2.0,
           marginBottom: Sizes.fixPadding,
         }}>
-        <IntlPhoneInput
+          <Text>
+            Correo:
+          </Text>
+          <TextInput
+            style={styles.input}
+            placeholder='micorreo@gmail.com'
+          />
+          <Text>
+            Clave:
+          </Text>
+          <TextInput
+            secureTextEntry={true}
+            style={styles.input}
+            placeholder='**********'
+          />
+        {/* <IntlPhoneInput
           onChangeText={({phoneNumber}) => setPhoneNumber(phoneNumber)}
-          defaultCountry="IN"
+          defaultCountry="EC"
           containerStyle={{backgroundColor: Colors.whiteColor}}
           placeholder={'Enter Your Number'}
           phoneInputStyle={styles.phoneInputStyle}
@@ -107,7 +123,7 @@ const LoginScreen = ({navigation}) => {
           }}
           modalCountryItemCountryNameStyle={{...Fonts.blackColor16Bold}}
           flagStyle={{width:40.0,height:40.0,marginBottom:10.0,}}
-        />        
+        />         */}
       </View>
     );
   }
@@ -120,11 +136,12 @@ const LoginScreen = ({navigation}) => {
           marginTop: Sizes.fixPadding * 4.0,
           marginBottom: Sizes.fixPadding * 2.0,
         }}>
-        <Text style={{...Fonts.blackColor20Bold}}>Welcome to Cabwind</Text>
+        <Text style={{...Fonts.blackColor20Bold}}>Bienvenido a MiGas App</Text>
         <Text
           style={{marginTop: Sizes.fixPadding, ...Fonts.grayColor14SemiBold}}>
-          Enter your phone number to continue
+          Ingresa tu correo y clave para comenzar
         </Text>
+        
       </View>
     );
   }
@@ -132,11 +149,11 @@ const LoginScreen = ({navigation}) => {
   function loginImage() {
     return (
       <Image
-        source={require('../../assets/images/login.png')}
+        source={require('../../assets/images/app_icon.png')}
         style={{
-          width: '100%',
+          width: 'auto',
           height: screenHeight / 3.0,
-          resizeMode: 'stretch',
+          resizeMode: 'contain',
         }}
       />
     );

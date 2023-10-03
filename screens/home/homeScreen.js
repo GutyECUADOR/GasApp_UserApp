@@ -81,7 +81,8 @@ const HomeScreen = ({navigation}) => {
     mapViewRef.current?.animateCamera({
       center: {
           latitude,
-          longitude
+          longitude,
+          zoom:5
       }
     })
   };
@@ -215,6 +216,9 @@ const HomeScreen = ({navigation}) => {
           color={Colors.primaryColor}
           accessibilityLabel="Clic para solicitar"
         />
+       {/*  <TouchableOpacity style={styles.appButtonContainer}>
+          <Text style={styles.appButtonText}>Clic para solicitar</Text>
+        </TouchableOpacity> */}
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
@@ -307,7 +311,12 @@ const HomeScreen = ({navigation}) => {
               />
             </Marker>
           ))}
-          <Marker coordinate={initialPosition}>
+          <Marker 
+            coordinate={initialPosition}
+            title='Solicitar aqui'
+            description='El delivery llegará a esta ubicación'
+          
+          >
             {/* <Image
               source={require('../../assets/images/icons/current_marker.png')}
               style={{width: 70.0, height: 70.0, resizeMode: 'contain'}}
@@ -332,6 +341,19 @@ const HomeScreen = ({navigation}) => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  appButtonContainer: {
+    elevation: 2,
+    backgroundColor: Colors.primaryColor,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12
+  },
+  appButtonText: {
+    fontSize: 18,
+    color: "#fff",
+    alignSelf: "center",
+    textTransform: "uppercase"
+  },
   exitInfoWrapStyle: {
     backgroundColor: Colors.lightBlackColor,
     position: 'absolute',

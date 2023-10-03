@@ -66,6 +66,8 @@ function MyApp() {
         }}
       >
         <Stack.Screen name="Splash" component={SplashScreen} options={{ ...TransitionPresets.DefaultTransition }} />
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
         {/* <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Verification" component={VerificationScreen} /> */}
