@@ -16,6 +16,7 @@
     "@react-navigation/stack": "^6.3.17",
     "@rneui/base": "^0.0.0-edge.2",
     "@rneui/themed": "^0.0.0-edge.2",
+    "axios": "^1.5.1",
     "d3-shape": "^3.2.0",
     "install": "^0.13.0",
     "npm": "^10.1.0",

@@ -31,6 +31,7 @@ import OnboardingScreen from './screens/onboarding/onboardingScreen';
 import LoginScreen from './screens/auth/loginScreen';
 import RegisterScreen from './screens/auth/registerScreen';
 import VerificationScreen from './screens/auth/verificationScreen';
+import { AuthProvider } from './context/AuthContext';
 
 LogBox.ignoreAllLogs();
 
@@ -56,45 +57,53 @@ const DrawerNavigation = () => {
   )
 }
 
+const AppState = ({ children }:any) => {
+  return <AuthProvider>
+    { children }
+  </AuthProvider>
+}
+
 function MyApp() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          ...TransitionPresets.SlideFromRightIOS,
-        }}
-      >
-        <Stack.Screen name="Splash" component={SplashScreen} options={{ ...TransitionPresets.DefaultTransition }} />
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        {/* <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-      <Stack.Screen name="Verification" component={VerificationScreen} /> */}
-        <Stack.Screen name="Login" component={LoginScreen} options={{ ...TransitionPresets.DefaultTransition }} />
-        <Stack.Screen name="Home" component={DrawerNavigation} options={{ ...TransitionPresets.DefaultTransition }} />
-        <Stack.Screen name="DropOffLocation" component={DropOffLocationScreen} />
-        <Stack.Screen name="BookNow" component={BookNowScreen} />
-        <Stack.Screen name="SelectCab" component={SelectCabScreen} />
-        <Stack.Screen name="SelectPaymentMethod" component={SelectPaymentMethodScreen} />
-        <Stack.Screen name="SearchingForDrivers" component={SearchingForDriversScreen} />
-        <Stack.Screen name="DriverDetail" component={DriverDetailScreen} />
-        <Stack.Screen name="ChatWithDriver" component={ChatWithDriverScreen} />
-        <Stack.Screen name="RideStarted" component={RideStartedScreen} />
-        <Stack.Screen name="RideEnd" component={RideEndScreen} />
-        <Stack.Screen name="Rating" component={RatingScreen} />
-        <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-        <Stack.Screen name="UserRides" component={UserRidesScreen} />
-        <Stack.Screen name="RideDetail" component={RideDetailScreen} />
-        <Stack.Screen name="Wallet" component={WalletScreen} />
-        <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
-        <Stack.Screen name="AddPaymentMethod" component={AddPaymentMethodScreen} />
-        <Stack.Screen name="Notifications" component={NotificationsScreen} />
-        <Stack.Screen name="InviteFriends" component={InviteFriendsScreen} />
-        <Stack.Screen name="Faqs" component={FaqsScreen} />
-        <Stack.Screen name="ContactUs" component={ContactUsScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AppState>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            ...TransitionPresets.SlideFromRightIOS,
+          }}
+        >
+          <Stack.Screen name="Splash" component={SplashScreen} options={{ ...TransitionPresets.DefaultTransition }} />
+          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+          {/* <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="Verification" component={VerificationScreen} /> */}
+          <Stack.Screen name="Login" component={LoginScreen} options={{ ...TransitionPresets.DefaultTransition }} />
+          <Stack.Screen name="Home" component={DrawerNavigation} options={{ ...TransitionPresets.DefaultTransition }} />
+          <Stack.Screen name="DropOffLocation" component={DropOffLocationScreen} />
+          <Stack.Screen name="BookNow" component={BookNowScreen} />
+          <Stack.Screen name="SelectCab" component={SelectCabScreen} />
+          <Stack.Screen name="SelectPaymentMethod" component={SelectPaymentMethodScreen} />
+          <Stack.Screen name="SearchingForDrivers" component={SearchingForDriversScreen} />
+          <Stack.Screen name="DriverDetail" component={DriverDetailScreen} />
+          <Stack.Screen name="ChatWithDriver" component={ChatWithDriverScreen} />
+          <Stack.Screen name="RideStarted" component={RideStartedScreen} />
+          <Stack.Screen name="RideEnd" component={RideEndScreen} />
+          <Stack.Screen name="Rating" component={RatingScreen} />
+          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+          <Stack.Screen name="UserRides" component={UserRidesScreen} />
+          <Stack.Screen name="RideDetail" component={RideDetailScreen} />
+          <Stack.Screen name="Wallet" component={WalletScreen} />
+          <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
+          <Stack.Screen name="AddPaymentMethod" component={AddPaymentMethodScreen} />
+          <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="InviteFriends" component={InviteFriendsScreen} />
+          <Stack.Screen name="Faqs" component={FaqsScreen} />
+          <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AppState>
   );
 }
 

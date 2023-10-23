@@ -9,13 +9,20 @@ import {
   Platform,
   TextInput
 } from 'react-native';
-import React, {useState, useCallback} from 'react';
+import React, {useState, useContext, useCallback} from 'react';
 import {Colors, Fonts, Sizes, screenHeight} from '../../constants/styles';
 import IntlPhoneInput from 'react-native-intl-phone-input';
 import {useFocusEffect} from '@react-navigation/native';
 import MyStatusBar from '../../components/myStatusBar';
+import { AuthContext } from '../../context/AuthContext';
 
 const LoginScreen = ({navigation}) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [backClickCount, setBackClickCount] = useState(0);
+
+  const { signIn } = useContext(AuthContext)
+
   const backAction = () => {
     if (Platform.OS === 'ios') {
       navigation.addListener('beforeRemove', e => {
@@ -45,8 +52,6 @@ const LoginScreen = ({navigation}) => {
     }, 1000);
   }
 
-  const [backClickCount, setBackClickCount] = useState(0);
-  const [phoneNumber, setPhoneNumber] = useState('');
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
@@ -58,21 +63,22 @@ const LoginScreen = ({navigation}) => {
           contentContainerStyle={{justifyContent: 'flex-end', flexGrow: 1}}>
           {loginImage()}
           {welcomeInfo()}
-          {mobileNumberInfo()}
+          {loginForm()}
         </ScrollView>
-        {continueButton()}
+        {loginButton()}
         {registerButton()}
       </View>
       {exitInfo()}
     </View>
   );
 
-  function continueButton() {
+  function loginButton() {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => {
-          navigation.push('Home');
+          signIn({ email, password })
+          //navigation.push('Home');
         }}
         style={styles.buttonStyle}>
         <Text style={{...Fonts.whiteColor18Bold}}>Iniciar Sesión</Text>
@@ -103,7 +109,7 @@ const LoginScreen = ({navigation}) => {
     ) : null;
   }
 
-  function mobileNumberInfo() {
+  function loginForm() {
     return (
       <View
         style={{
@@ -114,6 +120,8 @@ const LoginScreen = ({navigation}) => {
             Correo:
           </Text>
           <TextInput
+            value={email}
+            onChangeText={value => setEmail(value)}
             style={styles.input}
             placeholder='micorreo@gmail.com'
           />
@@ -122,6 +130,8 @@ const LoginScreen = ({navigation}) => {
           </Text>
           <TextInput
             secureTextEntry={true}
+            value={password}
+            onChangeText={value => setPassword(value)}
             style={styles.input}
             placeholder='**********'
           />
