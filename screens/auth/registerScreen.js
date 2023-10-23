@@ -1,13 +1,16 @@
 import {
   StyleSheet,
   Text,
+  Image,
   View,
   TouchableOpacity,
   ScrollView,
   TextInput,
+  ActivityIndicator
 } from 'react-native';
 import React, {useState} from 'react';
 import {Colors, Fonts, Sizes} from '../../constants/styles';
+import {Overlay} from '@rneui/themed';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MyStatusBar from '../../components/myStatusBar';
 
@@ -15,6 +18,9 @@ const RegisterScreen = ({navigation}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setisLoading] = useState(false);
+  const [isSuccess, setisSuccess] = useState(false);
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
@@ -27,9 +33,13 @@ const RegisterScreen = ({navigation}) => {
           {fullNameInfo()}
           {emailInfo()}
           {phoneNumberInfo()}
+          {passwordInfo()}
         </ScrollView>
       </View>
       {continueButton()}
+      {loadingDialog()}
+      {successDialog()}
+      
     </View>
   );
 
@@ -38,10 +48,15 @@ const RegisterScreen = ({navigation}) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => {
-          navigation.push('Verification');
+          setisLoading(true);
+          setTimeout(() => {
+            setisLoading(false);
+            setisSuccess(true);
+            //navigation.push('Login');
+          }, 2000);
         }}
         style={styles.buttonStyle}>
-        <Text style={{...Fonts.whiteColor18Bold}}>Continue</Text>
+        <Text style={{...Fonts.whiteColor18Bold}}>Registrarme</Text>
       </TouchableOpacity>
     );
   }
@@ -53,14 +68,14 @@ const RegisterScreen = ({navigation}) => {
           marginHorizontal: Sizes.fixPadding * 2.0,
           marginBottom: Sizes.fixPadding * 2.0,
         }}>
-        <Text style={{...Fonts.grayColor15SemiBold}}>Phone Number</Text>
+        <Text style={{...Fonts.grayColor15SemiBold}}>Número de teléfono</Text>
         <TextInput
           value={phoneNumber}
           onChangeText={value => setPhoneNumber(value)}
           style={styles.textFieldStyle}
           cursorColor={Colors.primaryColor}
           keyboardType="phone-pad"
-          placeholder="Enter PhoneNumber"
+          placeholder="Ingresa tu número de celular"
           placeholderTextColor={Colors.lightGrayColor}
         />
         {divider()}
@@ -75,14 +90,14 @@ const RegisterScreen = ({navigation}) => {
           marginHorizontal: Sizes.fixPadding * 2.0,
           marginBottom: Sizes.fixPadding * 2.0,
         }}>
-        <Text style={{...Fonts.grayColor15SemiBold}}>Email Address</Text>
+        <Text style={{...Fonts.grayColor15SemiBold}}>Email</Text>
         <TextInput
           value={email}
           onChangeText={value => setEmail(value)}
           style={styles.textFieldStyle}
           cursorColor={Colors.primaryColor}
           keyboardType="email-address"
-          placeholder="Enter Email"
+          placeholder="Ingresa tu correo electrónico"
           placeholderTextColor={Colors.lightGrayColor}
         />
         {divider()}
@@ -93,13 +108,86 @@ const RegisterScreen = ({navigation}) => {
   function fullNameInfo() {
     return (
       <View style={{margin: Sizes.fixPadding * 2.0}}>
-        <Text style={{...Fonts.grayColor15SemiBold}}>Full Name</Text>
+        <Text style={{...Fonts.grayColor15SemiBold}}>Nombre Completo</Text>
         <TextInput
           value={name}
           onChangeText={value => setName(value)}
           style={styles.textFieldStyle}
           cursorColor={Colors.primaryColor}
-          placeholder="Enter FullName"
+          placeholder="Ingresa tu nombre y apellido"
+          placeholderTextColor={Colors.lightGrayColor}
+        />
+        {divider()}
+      </View>
+    );
+  }
+
+  function loadingDialog() {
+    return (
+      <Overlay isVisible={isLoading} overlayStyle={styles.dialogStyle}>
+        <ActivityIndicator
+          size={56}
+          color={Colors.primaryColor}
+          style={{
+            alignSelf: 'center',
+            transform: [{scale: Platform.OS == 'ios' ? 2 : 1}],
+          }}
+        />
+        <Text
+          style={{
+            marginTop: Sizes.fixPadding * 2.0,
+            textAlign: 'center',
+            ...Fonts.grayColor14Regular,
+          }}>
+          Espere por favor...
+        </Text>
+      </Overlay>
+    );
+  }
+
+  function successDialog() {
+    return (
+      <Overlay isVisible={isSuccess} overlayStyle={styles.dialogStyle}>
+        <Image
+          source={require('../../assets/images/app_icon.png')}
+          style={{
+            width: 'auto',
+            height: 100,
+            resizeMode: 'contain',
+          }}
+        />
+        <Text
+          style={{
+            fontSize: 20,
+            marginTop: Sizes.fixPadding * 2.0,
+            textAlign: 'center',
+            ...Fonts.blackColor14SemiBold,
+          }}>
+          Registro correcto
+        </Text>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => {
+              navigation.push('Login');
+          }}
+          style={styles.buttonStyle}>
+          <Text style={{...Fonts.whiteColor18Bold}}>Aceptar</Text>
+        </TouchableOpacity>
+      </Overlay>
+    );
+  }
+
+  function passwordInfo() {
+    return (
+      <View style={{margin: Sizes.fixPadding * 2.0}}>
+        <Text style={{...Fonts.grayColor15SemiBold}}>Contraseña</Text>
+        <TextInput
+          secureTextEntry={true}
+          value={password}
+          onChangeText={value => setPassword(value)}
+          style={styles.textFieldStyle}
+          cursorColor={Colors.primaryColor}
+          placeholder="***"
           placeholderTextColor={Colors.lightGrayColor}
         />
         {divider()}
@@ -126,7 +214,7 @@ const RegisterScreen = ({navigation}) => {
             marginLeft: Sizes.fixPadding + 2.0,
             ...Fonts.blackColor20ExtraBold,
           }}>
-          Register
+          Registro de nuevo usuario
         </Text>
       </View>
     );
@@ -158,4 +246,13 @@ const styles = StyleSheet.create({
     marginHorizontal: Sizes.fixPadding * 6.0,
     marginVertical: Sizes.fixPadding * 2.0,
   },
+  dialogStyle: {
+    width: '80%',
+    backgroundColor: Colors.whiteColor,
+    borderRadius: Sizes.fixPadding - 5.0,
+    paddingHorizontal: Sizes.fixPadding * 2.0,
+    paddingBottom: Sizes.fixPadding + 5.0,
+    paddingTop: Sizes.fixPadding * 2.0,
+    elevation: 3.0,
+  }
 });

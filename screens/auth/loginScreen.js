@@ -61,6 +61,7 @@ const LoginScreen = ({navigation}) => {
           {mobileNumberInfo()}
         </ScrollView>
         {continueButton()}
+        {registerButton()}
       </View>
       {exitInfo()}
     </View>
@@ -75,6 +76,19 @@ const LoginScreen = ({navigation}) => {
         }}
         style={styles.buttonStyle}>
         <Text style={{...Fonts.whiteColor18Bold}}>Iniciar Sesión</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  function registerButton() {
+    return (
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => {
+          navigation.push('Register');
+        }}
+        style={styles.buttonRegisterStyle}>
+        <Text style={{...Fonts.blackColor18Bold}}>Aun No tienes cuenta? Clic Aqui</Text>
       </TouchableOpacity>
     );
   }
@@ -188,6 +202,11 @@ const styles = StyleSheet.create({
     borderRadius: Sizes.fixPadding - 5.0,
     paddingVertical: Sizes.fixPadding + 3.0,
     marginHorizontal: Sizes.fixPadding * 6.0,
-    marginVertical: Sizes.fixPadding * 2.0,
+    marginVertical: Sizes.fixPadding * 0.25,
+  },
+  buttonRegisterStyle: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 20,
   },
 });

@@ -127,7 +127,7 @@ const CustomDrawer = props => {
                 marginLeft: Sizes.fixPadding,
                 ...Fonts.blackColor16SemiBold,
               }}>
-              Do You Want to Logout...?
+              Desea cerrar sesión...?
             </Text>
           </View>
           <View style={styles.cancelAndLogoutButtonWrapStyle}>
@@ -141,7 +141,7 @@ const CustomDrawer = props => {
                 borderColor: Colors.lightGrayColor,
                 backgroundColor: Colors.whiteColor,
               }}>
-              <Text style={{...Fonts.grayColor16Bold}}>Cancel</Text>
+              <Text style={{...Fonts.grayColor16Bold}}>Cancelar</Text>
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.8}
@@ -153,7 +153,7 @@ const CustomDrawer = props => {
                 ...styles.cancelAndLogoutButtonStyle,
                 ...styles.logoutButtonStyle,
               }}>
-              <Text style={{...Fonts.whiteColor16Bold}}>Logout</Text>
+              <Text style={{...Fonts.whiteColor16Bold}}>Cerrar Sesión</Text>
             </TouchableOpacity>
           </View>
         </View>
