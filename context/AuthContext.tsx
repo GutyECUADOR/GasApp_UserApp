@@ -7,7 +7,7 @@ type AuthContextProps = {
     errorMessage: string;
     token: string | null;
     user: User | null;
-    status: 'checking' | 'Authenticated' | 'NotAuthenticated'
+    status: 'checking' | 'authenticated' | 'not-authenticated'
     signIn: ( loginDataForm: LoginDataForm) => void;
     signUp: () => void;
     logOut: () => void;
@@ -29,34 +29,48 @@ export const AuthProvider = ({ children }:any) => {
     const [state, dispatch] = useReducer(authReducer, authInitialState)
 
     const signIn = async ( {email, password}: LoginDataForm) => {
-       
-            const response = await gasAPI.post('/api/login', {email, password }, {
+        
+        try {
+            const { data } = await gasAPI.post('/api/login', {email, password }, {
                 headers: { 
                     'Accept': 'application/json', 
                     'Content-Type': 'application/json'
                   }    
-                }).then(resp => {
-                    console.log(resp.data);
-                }).catch(function (error) {
-                    console.log(error.response.data);
                 });
+            
+            dispatch({
+                type: 'signUp',
+                payload: {
+                    token: data.access_token,
+                    user: data.user
+                }
+            })
 
-        
-        return;
+            console.log(data);
+        } catch (error: any) {
+            dispatch({ 
+                type: 'addError', 
+                payload: error.response.data.msg || 'Información incorrecta'
+            })
+        }
+
     };
     const signUp = () => {};
     const logOut = () => {};
-    const removeError = () => {};
+    const removeError = () => {
+        dispatch({ type: 'removeError' });
+    };
 
 
-    return <AuthContext.Provider value={{
-        ...state,
-        signUp,
-        signIn,
-        logOut,
-        removeError
-
-    }}>
-        { children }
-    </AuthContext.Provider>
+    return (
+        <AuthContext.Provider value={{
+            ...state,
+            signUp,
+            signIn,
+            logOut,
+            removeError,
+        }}>
+            { children }
+        </AuthContext.Provider>
+    )
 } 
