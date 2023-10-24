@@ -31,6 +31,7 @@ import OnboardingScreen from '../screens/onboarding/onboardingScreen';
 import LoginScreen from '../screens/auth/loginScreen';
 import RegisterScreen from '../screens/auth/registerScreen';
 import { AuthContext } from '../context/AuthContext';
+import { LoadingScreen } from '../screens/LoadingScreen/LoadingScreen';
 
 LogBox.ignoreAllLogs();
 
@@ -60,6 +61,10 @@ export const Navigator = () => {
 
   const { status } = useContext( AuthContext );
   console.log('Navigation: '+status)
+
+  if (status === "checking") {
+    return <LoadingScreen></LoadingScreen>
+  }
 
   return (
     <Stack.Navigator
