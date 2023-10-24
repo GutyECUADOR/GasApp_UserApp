@@ -3,6 +3,8 @@ import Geolocation from '@react-native-community/geolocation';
 import { Location } from "../interfaces/Location";
 import Geocoder from 'react-native-geocoding';
 import {Key} from '../constants/key';
+import Config from "react-native-config";
+
 
 export const useLocation = () => {
 
@@ -13,7 +15,7 @@ export const useLocation = () => {
         longitude: 0
     })
 
-    Geocoder.init(Key.apiKey); // use a valid API key
+    Geocoder.init(Key.apiKey); // TODO - use a valid API key from ConfigFILE
 
     const getCurrentLocation = (): Promise<Location> => {
       return new Promise( (resolve, reject) => {

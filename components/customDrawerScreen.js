@@ -1,5 +1,5 @@
 import {DrawerContentScrollView} from '@react-navigation/drawer';
-import React, {useState, useRef,useCallback} from 'react';
+import React, {useState, useContext, useRef,useCallback} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -26,6 +26,7 @@ import Svg, {Path} from 'react-native-svg';
 import * as shape from 'd3-shape';
 import {useDrawerStatus} from '@react-navigation/drawer';
 import { useFocusEffect } from '@react-navigation/native';
+import { AuthContext } from '../context/AuthContext';
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
@@ -81,6 +82,8 @@ const CustomDrawer = props => {
     inputRange: [0, screenWidth],
     outputRange: [-screenWidth, 0],
   });
+
+  const { logOut, user } = useContext(AuthContext)
 
   return (
     <View
@@ -147,7 +150,8 @@ const CustomDrawer = props => {
               activeOpacity={0.8}
               onPress={() => {
                 setShowLogoutDialog(false);
-                props.navigation.push('Login');
+                logOut();
+                //props.navigation.push('Login');
               }}
               style={{
                 ...styles.cancelAndLogoutButtonStyle,
@@ -332,10 +336,10 @@ const CustomDrawer = props => {
           </View>
           <View style={{flex: 1, marginLeft: Sizes.fixPadding + 8.0}}>
             <Text numberOfLines={1} style={{...Fonts.whiteColor16Bold}}>
-              Samantha Smith
+              { user?.name }
             </Text>
             <Text numberOfLines={1} style={{...Fonts.whiteColor14Regular}}>
-              samanthasmith@gmail.com
+              { user?.email}
             </Text>
           </View>
         </View>

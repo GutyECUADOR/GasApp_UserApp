@@ -84,7 +84,7 @@ const HomeScreen = ({navigation}) => {
       center: {
           latitude,
           longitude,
-          zoom:5
+          zoom:8
       }
     })
   };

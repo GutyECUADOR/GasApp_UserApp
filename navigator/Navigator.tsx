@@ -58,8 +58,8 @@ const DrawerNavigation = () => {
 
 export const Navigator = () => {
 
-  const { token } = useContext( AuthContext );
-  console.log(token)
+  const { status } = useContext( AuthContext );
+  console.log('Navigation: '+status)
 
   return (
     <Stack.Navigator
@@ -69,7 +69,7 @@ export const Navigator = () => {
           }}
         >
           {
-            (token == null) 
+            (status !== 'authenticated') 
             ? (
               <>
                 <Stack.Screen name="Splash" component={SplashScreen} options={{ ...TransitionPresets.DefaultTransition }} />

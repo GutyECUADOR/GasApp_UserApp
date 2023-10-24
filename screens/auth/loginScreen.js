@@ -7,9 +7,10 @@ import {
   Image,
   BackHandler,
   Platform,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native';
-import React, {useState, useContext, useCallback} from 'react';
+import React, {useState, useContext, useCallback, useEffect} from 'react';
 import {Colors, Fonts, Sizes, screenHeight} from '../../constants/styles';
 import IntlPhoneInput from 'react-native-intl-phone-input';
 import {useFocusEffect} from '@react-navigation/native';
@@ -21,7 +22,7 @@ const LoginScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [backClickCount, setBackClickCount] = useState(0);
 
-  const { signIn } = useContext(AuthContext)
+  const { signIn, errorMessage, removeError } = useContext(AuthContext)
 
   const backAction = () => {
     if (Platform.OS === 'ios') {
@@ -44,6 +45,20 @@ const LoginScreen = ({navigation}) => {
       };
     }, [backAction]),
   );
+
+  useEffect(() => {
+    if (errorMessage.length === 0) {
+      return;
+    }
+    Alert.alert('Login Incorrecto', errorMessage, [ {
+      text: 'Aceptar',
+      onPress: () => {
+        removeError();
+      }
+    }]);
+
+  }, [errorMessage])
+  
 
   function _spring() {
     setBackClickCount(1);

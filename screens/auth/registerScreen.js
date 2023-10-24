@@ -8,19 +8,21 @@ import {
   TextInput,
   ActivityIndicator
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Colors, Fonts, Sizes} from '../../constants/styles';
 import {Overlay} from '@rneui/themed';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MyStatusBar from '../../components/myStatusBar';
+import { AuthContext } from '../../context/AuthContext';
 
 const RegisterScreen = ({navigation}) => {
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setisLoading] = useState(false);
   const [isSuccess, setisSuccess] = useState(false);
+  const { signUp } = useContext(AuthContext)
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
@@ -36,24 +38,25 @@ const RegisterScreen = ({navigation}) => {
           {passwordInfo()}
         </ScrollView>
       </View>
-      {continueButton()}
+      {registerButton()}
       {loadingDialog()}
       {successDialog()}
       
     </View>
   );
 
-  function continueButton() {
+  function registerButton() {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => {
           setisLoading(true);
-          setTimeout(() => {
+          signUp({ name, phone, email, password })
+          /* setTimeout(() => {
             setisLoading(false);
             setisSuccess(true);
             //navigation.push('Login');
-          }, 2000);
+          }, 2000); */
         }}
         style={styles.buttonStyle}>
         <Text style={{...Fonts.whiteColor18Bold}}>Registrarme</Text>
@@ -70,8 +73,8 @@ const RegisterScreen = ({navigation}) => {
         }}>
         <Text style={{...Fonts.grayColor15SemiBold}}>Número de teléfono</Text>
         <TextInput
-          value={phoneNumber}
-          onChangeText={value => setPhoneNumber(value)}
+          value={phone}
+          onChangeText={value => setPhone(value)}
           style={styles.textFieldStyle}
           cursorColor={Colors.primaryColor}
           keyboardType="phone-pad"
@@ -169,6 +172,7 @@ const RegisterScreen = ({navigation}) => {
           activeOpacity={0.8}
           onPress={() => {
               navigation.push('Login');
+              isSuccess(false);
           }}
           style={styles.buttonStyle}>
           <Text style={{...Fonts.whiteColor18Bold}}>Aceptar</Text>
