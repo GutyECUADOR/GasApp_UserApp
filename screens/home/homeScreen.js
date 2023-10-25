@@ -20,44 +20,19 @@ import {useFocusEffect} from '@react-navigation/native';
 import MyStatusBar from '../../components/myStatusBar';
 import { useLocation } from '../../hooks/useLocation';
 
+import firestore from '@react-native-firebase/firestore';
 
-const distribuidoresCercanos = [
+
+/* const distribuidoresCercanos = [
   {
-    id: '1',
+    id: 'nxjb7VxPREN05ZUalLpR',
     coordinate: {
       latitude: -0.19187,
       longitude: -78.49251166666667,
     },
   },
-  {
-    id: '2',
-    coordinate: {
-      latitude: -0.20187,
-      longitude: -78.49551166666667,
-    },
-  },
-  {
-    id: '3',
-    coordinate: {
-      latitude: -0.19187,
-      longitude: -78.49451166666667,
-    },
-  },
-  {
-    id: '4',
-    coordinate: {
-      latitude: -0.19587,
-      longitude: -78.49451166666667,
-    },
-  },
-  {
-    id: '5',
-    coordinate: {
-      latitude: -0.18,
-      longitude: -78.49451166666667,
-    },
-  },
-];
+
+]; */
 
 /* const nearestLocations = [
   {
@@ -72,8 +47,45 @@ const distribuidoresCercanos = [
   },
 ]; */
 
+  const [distribuidoresCercanos, setdistribuidoresCercanos] = useState([])
+
 const HomeScreen = ({navigation}) => {
+
+  /* const getDistribuidores = async () => {
+    try {
+      const distribuidoresCercanos = await firestore().collection('distribuidores').get();
+      console.log('distribuidor:',distribuidoresCercanos.docs[0].data());
+      setdistribuidoresCercanos(distribuidoresCercanos.docs[0].data())
+    } catch (error) {
+      console.log(error);
+    }
+    
+  }
   
+  useEffect(() => {
+    getDistribuidores();
+  }, []) */
+
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('distribuidores')
+      .onSnapshot(querySnapshot => {
+        const distribuidores = [];
+  
+        querySnapshot.forEach(documentSnapshot => {
+          distribuidores.push({
+            id: documentSnapshot.id,
+            ...documentSnapshot.data(),
+          });
+        });
+  
+        setdistribuidoresCercanos(distribuidores);
+        console.log('distribuidores:', distribuidores)
+      });
+  
+  }, []);
+  
+
   const { hasLocation, initialPosition, getCurrentLocation, address } = useLocation();
   const mapViewRef = useRef();
 
