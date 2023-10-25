@@ -73,9 +73,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.GasAPP_UserApp"
+    namespace "com.gasdeliveryuserapp"
     defaultConfig {
-        applicationId "com.GasAPP_UserApp"
+        applicationId "com.gasdeliveryuserapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

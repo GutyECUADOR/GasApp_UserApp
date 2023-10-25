@@ -1,4 +1,4 @@
-package com.GasAPP_UserApp;
+package com.gasdeliveryuserapp;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

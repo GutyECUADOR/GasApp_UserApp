@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "GasAPP_UserApp.app"
-               BlueprintName = "GasAPP_UserApp"
-               ReferencedContainer = "container:GasAPP_UserApp.xcodeproj">
+               BuildableName = "gasdeliveryuserapp.app"
+               BlueprintName = "gasdeliveryuserapp"
+               ReferencedContainer = "container:gasdeliveryuserapp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "GasAPP_UserAppTests.xctest"
-               BlueprintName = "GasAPP_UserAppTests"
-               ReferencedContainer = "container:GasAPP_UserApp.xcodeproj">
+               BuildableName = "gasdeliveryuserappTests.xctest"
+               BlueprintName = "gasdeliveryuserappTests"
+               ReferencedContainer = "container:gasdeliveryuserapp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "GasAPP_UserApp.app"
-            BlueprintName = "GasAPP_UserApp"
-            ReferencedContainer = "container:GasAPP_UserApp.xcodeproj">
+            BuildableName = "gasdeliveryuserapp.app"
+            BlueprintName = "gasdeliveryuserapp"
+            ReferencedContainer = "container:gasdeliveryuserapp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "GasAPP_UserApp.app"
-            BlueprintName = "GasAPP_UserApp"
-            ReferencedContainer = "container:GasAPP_UserApp.xcodeproj">
+            BuildableName = "gasdeliveryuserapp.app"
+            BlueprintName = "gasdeliveryuserapp"
+            ReferencedContainer = "container:gasdeliveryuserapp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

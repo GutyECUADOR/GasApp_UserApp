@@ -7,11 +7,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
-@interface GasAPP_UserAppTests : XCTestCase
+@interface gasdeliveryuserappTests : XCTestCase
 
 @end
 
-@implementation GasAPP_UserAppTests
+@implementation gasdeliveryuserappTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL (^)(UIView *view))test
 {
