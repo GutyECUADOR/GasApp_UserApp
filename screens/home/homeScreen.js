@@ -20,71 +20,61 @@ import {useFocusEffect} from '@react-navigation/native';
 import MyStatusBar from '../../components/myStatusBar';
 import { useLocation } from '../../hooks/useLocation';
 
-import firestore from '@react-native-firebase/firestore';
-
-
-/* const distribuidoresCercanos = [
-  {
-    id: 'nxjb7VxPREN05ZUalLpR',
-    coordinate: {
-      latitude: -0.19187,
-      longitude: -78.49251166666667,
-    },
-  },
-
-]; */
-
-/* const nearestLocations = [
-  {
-    id: '1',
-    address: 'Bailey Drive, Fredericton',
-    addressDetail: '9 Bailey Drive, Fredericton, NB E3B 5A3',
-  },
-  {
-    id: '2',
-    address: 'Belleville St, Victoria',
-    addressDetail: '225 Belleville St, Victoria, BC V8V 1X1',
-  },
-]; */
-
-  const [distribuidoresCercanos, setdistribuidoresCercanos] = useState([])
+import database from '@react-native-firebase/database';
 
 const HomeScreen = ({navigation}) => {
 
-  /* const getDistribuidores = async () => {
-    try {
-      const distribuidoresCercanos = await firestore().collection('distribuidores').get();
-      console.log('distribuidor:',distribuidoresCercanos.docs[0].data());
-      setdistribuidoresCercanos(distribuidoresCercanos.docs[0].data())
-    } catch (error) {
-      console.log(error);
-    }
+  const [backClickCount, setBackClickCount] = useState(0);
+  const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([
     
+  ])
+  const [data, setData] = useState([])
+
+  const getData = () => {
+    database()
+      .ref('/notas')
+      .on('value', snapshot => {
+        let responselist = Object.values(snapshot.val())
+       
+        const markers = responselist.map( responselist =>{
+          return {
+            id: responselist["id:"],
+            coordinate: {
+              latitude: responselist["coordinate"]["latitude"],
+              longitude: responselist["coordinate"]["longitude"],
+            }
+          }
+        });
+
+        /* const objeto1 = {
+            id: responselist[0]["id:"],
+            coordinate: {
+              latitude: responselist[0]["coordinate"]["latitude"],
+              longitude: responselist[0]["coordinate"]["longitude"],
+            }
+          }
+
+        const objeto2 = {
+          id: responselist[1]["id:"],
+          coordinate: {
+            latitude: responselist[1]["coordinate"]["latitude"],
+            longitude: responselist[1]["coordinate"]["longitude"],
+          }
+        } */
+       
+        setDistribuidoresCercanos(markers);
+        console.log('User data: ', responselist);
+        /* console.log('markers: ', objeto1.coordinate.latitude);
+        console.log('markers: ', objeto1.coordinate.longitude); */
+      });
+
   }
-  
-  useEffect(() => {
-    getDistribuidores();
-  }, []) */
 
   useEffect(() => {
-    const subscriber = firestore()
-      .collection('distribuidores')
-      .onSnapshot(querySnapshot => {
-        const distribuidores = [];
-  
-        querySnapshot.forEach(documentSnapshot => {
-          distribuidores.push({
-            id: documentSnapshot.id,
-            ...documentSnapshot.data(),
-          });
-        });
-  
-        setdistribuidoresCercanos(distribuidores);
-        console.log('distribuidores:', distribuidores)
-      });
-  
+   
+      getData()
+    
   }, []);
-  
 
   const { hasLocation, initialPosition, getCurrentLocation, address } = useLocation();
   const mapViewRef = useRef();
@@ -152,8 +142,8 @@ const HomeScreen = ({navigation}) => {
       </Overlay>
     );
   }
+  
 
-  const [backClickCount, setBackClickCount] = useState(0);
 
   return (
     
@@ -315,7 +305,7 @@ const HomeScreen = ({navigation}) => {
           style={{height: '100%'}}
           provider={PROVIDER_GOOGLE}>
           {distribuidoresCercanos.map((item, index) => (
-            <Marker key={`${item.id}`} coordinate={item.coordinate}>
+            <Marker key={`${index}`} coordinate={ item.coordinate }>
               <Image
                 source={require('../../assets/images/icons/cilindro_amarillo.png')}
                 style={{
