@@ -20,7 +20,8 @@ import {useFocusEffect} from '@react-navigation/native';
 import MyStatusBar from '../../components/myStatusBar';
 import { useLocation } from '../../hooks/useLocation';
 
-import database from '@react-native-firebase/database';
+//import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 
 const HomeScreen = ({navigation}) => {
 
@@ -28,9 +29,9 @@ const HomeScreen = ({navigation}) => {
   const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([
     
   ])
-  const [data, setData] = useState([])
+  
 
-  const getData = () => {
+  const getDataRealTimeDB= () => {
     database()
       .ref('/notas')
       .on('value', snapshot => {
@@ -46,21 +47,7 @@ const HomeScreen = ({navigation}) => {
           }
         });
 
-        /* const objeto1 = {
-            id: responselist[0]["id:"],
-            coordinate: {
-              latitude: responselist[0]["coordinate"]["latitude"],
-              longitude: responselist[0]["coordinate"]["longitude"],
-            }
-          }
-
-        const objeto2 = {
-          id: responselist[1]["id:"],
-          coordinate: {
-            latitude: responselist[1]["coordinate"]["latitude"],
-            longitude: responselist[1]["coordinate"]["longitude"],
-          }
-        } */
+       
        
         setDistribuidoresCercanos(markers);
         console.log('User data: ', responselist);
@@ -71,9 +58,29 @@ const HomeScreen = ({navigation}) => {
   }
 
   useEffect(() => {
-   
-      getData()
-    
+    //getDataRealTimeDB()
+    const subscriber = firestore()
+    .collection('distribuidores')
+    .onSnapshot(querySnapshot => {
+      const markers = [];
+
+      querySnapshot.forEach(documentSnapshot => {
+        markers.push({
+          id: documentSnapshot.id,
+          coordinate: {
+            latitude: documentSnapshot.get('coordinate').latitude,
+            longitude: documentSnapshot.get('coordinate').longitude,
+          },
+        });
+      });
+
+      console.log('Markers Distribuidores: ', markers);
+      setDistribuidoresCercanos(markers);
+     
+    });
+
+    // Unsubscribe from events when no longer in use
+    return () => subscriber();
   }, []);
 
   const { hasLocation, initialPosition, getCurrentLocation, address } = useLocation();
@@ -296,6 +303,8 @@ const HomeScreen = ({navigation}) => {
       <View style={{flex: 1}}>
         <MapView
           ref={ (element) => mapViewRef.current = element}
+          zoomEnabled={true}
+          zoomControlEnabled={true}
           region={{
             latitude: initialPosition.latitude,
             longitude: initialPosition.longitude,
