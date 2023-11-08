@@ -203,7 +203,7 @@ const CustomDrawer = props => {
         {divider()}
         {drawerOptionSort({
           iconName: 'book',
-          option: 'Mis Agendamientos',
+          option: 'Mis pedidos',
           onPress: () => {
             props.navigation.closeDrawer();
             props.navigation.push('UserRides');

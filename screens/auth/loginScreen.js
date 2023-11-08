@@ -76,12 +76,12 @@ const LoginScreen = ({navigation}) => {
           automaticallyAdjustKeyboardInsets={true}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{justifyContent: 'flex-end', flexGrow: 1}}>
+        </ScrollView>
           {loginImage()}
           {welcomeInfo()}
           {loginForm()}
-        </ScrollView>
-        {loginButton()}
-        {registerButton()}
+          {loginButton()}
+          {registerButton()}
       </View>
       {exitInfo()}
     </View>
@@ -109,7 +109,7 @@ const LoginScreen = ({navigation}) => {
           navigation.push('Register');
         }}
         style={styles.buttonRegisterStyle}>
-        <Text style={{...Fonts.blackColor18Bold}}>Aun No tienes cuenta? Clic Aqui</Text>
+        <Text style={{...Fonts.blackColor15Bold}}>Aun no tienes cuenta? Clic Aqui</Text>
       </TouchableOpacity>
     );
   }
@@ -131,38 +131,26 @@ const LoginScreen = ({navigation}) => {
           marginHorizontal: Sizes.fixPadding * 2.0,
           marginBottom: Sizes.fixPadding,
         }}>
-          <Text>
-            Correo:
-          </Text>
+          <Text style={{...Fonts.grayColor15SemiBold}}>Correo</Text>
           <TextInput
             value={email}
             onChangeText={value => setEmail(value)}
-            style={styles.input}
+            style={styles.textFieldStyle}
+            cursorColor={Colors.primaryColor}
+            keyboardType="email-address"
+            autoCapitalize="none"
             placeholder='micorreo@gmail.com'
           />
-          <Text>
-            Clave:
-          </Text>
+          <Text style={{...Fonts.grayColor15SemiBold}}>Clave</Text>
           <TextInput
             secureTextEntry={true}
             value={password}
             onChangeText={value => setPassword(value)}
-            style={styles.input}
+            style={styles.textFieldStyle}
+            cursorColor={Colors.primaryColor}
             placeholder='**********'
           />
-        {/* <IntlPhoneInput
-          onChangeText={({phoneNumber}) => setPhoneNumber(phoneNumber)}
-          defaultCountry="EC"
-          containerStyle={{backgroundColor: Colors.whiteColor}}
-          placeholder={'Enter Your Number'}
-          phoneInputStyle={styles.phoneInputStyle}
-          dialCodeTextStyle={{
-            ...Fonts.blackColor15Bold,
-            marginHorizontal: Sizes.fixPadding - 2.0,
-          }}
-          modalCountryItemCountryNameStyle={{...Fonts.blackColor16Bold}}
-          flagStyle={{width:40.0,height:40.0,marginBottom:10.0,}}
-        />         */}
+        
       </View>
     );
   }
@@ -208,6 +196,14 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.shadowColor,
     borderBottomWidth: 1.0,
     padding:0
+  },
+  textFieldStyle: {
+    ...Fonts.blackColor16Bold,
+    marginTop: Sizes.fixPadding - 5.0,
+    marginBottom: Sizes.fixPadding - 4.0,
+    padding: 1,
+    borderColor: 'lightgrey',
+    borderBottomWidth: 1, // Puedes ajustar el ancho según tus preferencias
   },
   exitInfoWrapStyle: {
     backgroundColor: Colors.lightBlackColor,
