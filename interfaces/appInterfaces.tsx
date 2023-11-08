@@ -10,7 +10,8 @@ export interface RegisterData {
     name: string, 
     phone: string, 
     email: string, 
-    password: string
+    password: string,
+    role: string
 }
 
 export interface LoginResponse {
