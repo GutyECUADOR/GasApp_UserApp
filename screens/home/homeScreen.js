@@ -26,10 +26,9 @@ import firestore from '@react-native-firebase/firestore';
 const HomeScreen = ({navigation}) => {
 
   const [backClickCount, setBackClickCount] = useState(0);
-  const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([
-    
-  ])
-  
+  const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([])
+  const { hasLocation, initialPosition, getCurrentLocation, address } = useLocation();
+  const mapViewRef = useRef();
 
   const getDataRealTimeDB= () => {
     database()
@@ -58,9 +57,9 @@ const HomeScreen = ({navigation}) => {
   }
 
   useEffect(() => {
-    //getDataRealTimeDB()
+ 
     const subscriber = firestore()
-    .collection('distribuidores')
+    .collection('distribuidores').where('isActivo', '==', true)
     .onSnapshot(querySnapshot => {
       const markers = [];
 
@@ -82,9 +81,6 @@ const HomeScreen = ({navigation}) => {
     // Unsubscribe from events when no longer in use
     return () => subscriber();
   }, []);
-
-  const { hasLocation, initialPosition, getCurrentLocation, address } = useLocation();
-  const mapViewRef = useRef();
 
   const centerPosition = async () => {
     const { latitude, longitude } = await getCurrentLocation()
