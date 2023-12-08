@@ -26,35 +26,20 @@ import MyStatusBar from '../../components/myStatusBar';
 const paymentmethods = [
   {
     id: '1',
-    paymentIcon: require('../../assets/images/paymentMethods/visa.png'),
-    paymentType: 'card',
-    cardNumber: '**** **** **56 7896',
-    cardExpiry: '04/25',
+    paymentIcon: require('../../assets/images/paymentMethods/cash.png'),
+    paymentType: 'cash',
+    paymentMethod: 'Efectivo',
   },
   {
     id: '2',
-    paymentIcon: require('../../assets/images/paymentMethods/master_card.png'),
-    paymentType: 'card',
-    cardNumber: '**** **** **56 7896',
-    cardExpiry: '04/25',
-  },
-  {
-    id: '3',
-    paymentIcon: require('../../assets/images/paymentMethods/cash.png'),
-    paymentType: 'cash',
-    paymentMethod: 'Cash',
-  },
-  {
-    id: '4',
     paymentIcon: require('../../assets/images/paymentMethods/wallet.png'),
     paymentType: 'other',
-    paymentMethod: 'Wallet',
+    paymentMethod: 'Transferencia Bancaria',
   },
 ];
 
 const SelectPaymentMethodScreen = ({navigation}) => {
-  const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] =
-    useState(2);
+  const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] = useState(0);
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
@@ -90,8 +75,7 @@ const SelectPaymentMethodScreen = ({navigation}) => {
               iterationCount={1}
               duration={1500}
               style={{flex: 1}}>
-              {currentLocationInfo()}
-              {currentToDropLocDivider()}
+             
               {dropLocationInfo()}
               {paymentMethodsInfo()}
             </Animatable.View>
@@ -115,7 +99,7 @@ const SelectPaymentMethodScreen = ({navigation}) => {
           right: 0.0,
           left: 0.0,
         }}>
-        <Text style={{...Fonts.whiteColor18Bold}}>Book Ride</Text>
+        <Text style={{...Fonts.whiteColor18Bold}}>Confirmar</Text>
       </TouchableOpacity>
     );
   }
@@ -129,7 +113,7 @@ const SelectPaymentMethodScreen = ({navigation}) => {
         }}>
         <Text
           style={{marginBottom: Sizes.fixPadding, ...Fonts.blackColor18Bold}}>
-          Payment Method
+          Método de pago
         </Text>
         {paymentmethods.map((item, index) => (
           <TouchableOpacity
@@ -262,7 +246,7 @@ const SelectPaymentMethodScreen = ({navigation}) => {
             marginLeft: Sizes.fixPadding + 2.0,
             ...Fonts.blackColor20ExtraBold,
           }}>
-          Payment
+          Forma de pago
         </Text>
       </View>
     );
@@ -414,7 +398,7 @@ const styles = StyleSheet.create({
     marginHorizontal: Sizes.fixPadding * 2.0,
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: -(Sizes.fixPadding - 5.0),
+    marginTop: -(Sizes.fixPadding - 10.0),
   },
   buttonStyle: {
     marginTop: Sizes.fixPadding + 5.0,

@@ -4,6 +4,7 @@ import {
   View,
   Image,
   TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 import React from 'react';
 import {Colors, Fonts, Sizes, screenWidth} from '../../constants/styles';
@@ -56,13 +57,13 @@ const SearchingForDriversScreen = ({navigation}) => {
           }}
           style={{...styles.buttonStyle, marginRight: Sizes.fixPadding - 8.5}}>
           <Text numberOfLines={1} style={{...Fonts.whiteColor18Bold}}>
-            Cancel Ride
+            Cancelar
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => {
-            navigation.push('DriverDetail');
+            navigation.push('RideStarted');
           }}
           style={{...styles.buttonStyle, marginLeft: Sizes.fixPadding - 8.5}}>
           <Text numberOfLines={1} style={{...Fonts.whiteColor18Bold}}>
@@ -80,13 +81,13 @@ const SearchingForDriversScreen = ({navigation}) => {
           marginHorizontal: Sizes.fixPadding * 5.0,
           marginVertical: Sizes.fixPadding,
         }}>
-        <Progress.Bar
-          progress={0.5}
-          width={null}
-          color={Colors.lightBlackColor}
-          height={8.0}
-          unfilledColor={Colors.shadowColor}
-          borderWidth={0}
+        <ActivityIndicator
+          size={56}
+          color={Colors.primaryColor}
+          style={{
+            alignSelf: 'center',
+            transform: [{scale: Platform.OS == 'ios' ? 2 : 1}],
+          }}
         />
       </View>
     );
@@ -105,7 +106,7 @@ const SearchingForDriversScreen = ({navigation}) => {
             textAlign: 'center',
             margin: Sizes.fixPadding * 2.0,
           }}>
-          Hold on!! We are searching for{`\n`}nearby driver for you
+          Espera un momento!! Estamos contactando{`\n`} a un delivery cercano. Tiempo de espera máximo 15 min. Si ningun delivery ha aceptado tu solicitud despues de este tiempo intentalo más tarde.
         </Text>
       </View>
     );

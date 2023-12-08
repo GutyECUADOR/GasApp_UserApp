@@ -145,6 +145,20 @@ const HomeScreen = ({navigation}) => {
       </Overlay>
     );
   }
+
+  function continueButton() {
+    return (
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => {
+          navigation.push('SelectPaymentMethod');
+        }}
+        style={styles.buttonStyle}>
+        <Text style={{...Fonts.whiteColor18Bold}}>Solicitar cilindro</Text>
+      </TouchableOpacity>
+    );
+  }
+  
   
 
 
@@ -155,7 +169,8 @@ const HomeScreen = ({navigation}) => {
       <View style={{flex: 1}}>
         {displayMap()}
         {currentLocationWithMenuIcon()}
-        {nearestLocationsSheet()}
+        {/*  {nearestLocationsSheet()} */}
+        {continueButton()}
       </View>
       {exitInfo()}
       {loadingDialog()}
@@ -202,6 +217,7 @@ const HomeScreen = ({navigation}) => {
             {address} 
           </Text>
         </View>
+        {currentLocationIcon()}
       </View>
     );
   }
@@ -216,57 +232,23 @@ const HomeScreen = ({navigation}) => {
         }}
         lineStyle={styles.sheetIndicatorStyle}
         wrapperStyle={{...styles.bottomSheetWrapStyle}}>
-       {/*  {searchBar()} */}
         <Button
-          onPress={centerPosition}
+          onPress={
+            () => {
+              navigation.push('SelectPaymentMethod');
+            }
+          }
           title="Pedir Ahora"
           color={Colors.primaryColor}
           accessibilityLabel="Clic para solicitar"
         />
-       {/*  <TouchableOpacity style={styles.appButtonContainer}>
-          <Text style={styles.appButtonText}>Clic para solicitar</Text>
-        </TouchableOpacity> */}
+       
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingTop: Sizes.fixPadding,
             paddingBottom: Sizes.fixPadding * 3.0,
           }}>
-          {/* {nearestLocations.map((item, index) => (
-            <View key={`${item.id}`} style={{}}>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => {
-                  navigation.push('BookNow');
-                }}
-                style={{flexDirection: 'row', alignItems: 'center'}}>
-                <View style={styles.iconCircleStyle}>
-                  <MaterialIcons
-                    name="star-border"
-                    size={18}
-                    color={Colors.lightGrayColor}
-                  />
-                </View>
-                <View style={{flex: 1, marginLeft: Sizes.fixPadding + 5.0}}>
-                  <Text style={{...Fonts.blackColor16SemiBold}}>
-                    {item.address}
-                  </Text>
-                  <Text style={{...Fonts.grayColor15Regular}}>
-                    {item.addressDetail}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              {nearestLocations.length - 1 == index ? null : (
-                <View
-                  style={{
-                    backgroundColor: Colors.shadowColor,
-                    height: 1.0,
-                    marginVertical: Sizes.fixPadding + 5.0,
-                  }}
-                />
-              )}
-            </View>
-          ))} */}
         </ScrollView>
         {currentLocationIcon()}
       </BottomSheet>
@@ -300,7 +282,9 @@ const HomeScreen = ({navigation}) => {
         <MapView
           ref={ (element) => mapViewRef.current = element}
           zoomEnabled={true}
+          minZoomLevel={15}
           zoomControlEnabled={true}
+          showsUserLocation={false}
           region={{
             latitude: initialPosition.latitude,
             longitude: initialPosition.longitude,
@@ -402,8 +386,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   currentLocationIconWrapStyle: {
-    top: -100.0,
-    right: 0.0,
+    top: 10.0,
+    right: 10.0,
     position: 'absolute',
     flex: 1,
     borderRadius: 20.0,
@@ -428,4 +412,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryColor,
     borderRadius: Sizes.fixPadding,
   },
+  buttonStyle: {
+    backgroundColor: Colors.primaryColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Sizes.fixPadding + 3.0,
+  }
 });

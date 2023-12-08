@@ -52,10 +52,10 @@ const BookNowScreen = ({navigation}) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => {
-          navigation.push('SelectCab');
+          navigation.push('SelectPaymentMethod');
         }}
         style={styles.buttonStyle}>
-        <Text style={{...Fonts.whiteColor18Bold}}>Continue</Text>
+        <Text style={{...Fonts.whiteColor18Bold}}>Continuar al pago</Text>
       </TouchableOpacity>
     );
   }
@@ -144,7 +144,7 @@ const BookNowScreen = ({navigation}) => {
             marginLeft: Sizes.fixPadding + 2.0,
             ...Fonts.blackColor20ExtraBold,
           }}>
-          Book Your Ride
+          Confirma tu dirección
         </Text>
       </View>
     );

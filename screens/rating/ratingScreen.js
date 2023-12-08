@@ -32,7 +32,6 @@ const RatingScreen = ({navigation}) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{paddingBottom: Sizes.fixPadding * 2.0}}>
           {driverInfo()}
-          {ratingInfo()}
           {complimentInfo()}
           {submitButton()}
         </ScrollView>
@@ -48,7 +47,7 @@ const RatingScreen = ({navigation}) => {
           navigation.push('Home');
         }}
         style={styles.backToHomeTextStyle}>
-        Back to Home
+        Regresar al inicio
       </Text>
     );
   }
@@ -61,7 +60,7 @@ const RatingScreen = ({navigation}) => {
           navigation.push('Home');
         }}
         style={styles.buttonStyle}>
-        <Text style={{...Fonts.whiteColor18Bold}}>Submit</Text>
+        <Text style={{...Fonts.whiteColor18Bold}}>Enviar comentarios</Text>
       </TouchableOpacity>
     );
   }
@@ -72,7 +71,7 @@ const RatingScreen = ({navigation}) => {
         value={compliment}
         onChangeText={value => setCompliment(value)}
         style={styles.textFieldStyle}
-        placeholder="Give a compliment"
+        placeholder="Dejanos un comentario"
         placeholderTextColor={Colors.grayColor}
         cursorColor={Colors.primaryColor}
         selectionColor={Colors.primaryColor}
@@ -196,27 +195,12 @@ const RatingScreen = ({navigation}) => {
         style={{
           alignItems: 'center',
           marginHorizontal: Sizes.fixPadding * 2.0,
+          marginBottom: Sizes.fixPadding * 2.0
         }}>
         <View style={{alignItems: 'center', justifyContent: 'center'}}>
           <ImageBackground
-            source={require('../../assets/images/users/user2.png')}
+            source={require('../../assets/images/users/nouser.png')}
             style={styles.driverImageStyle}>
-            <View style={styles.ratingInfoWrapStyle}>
-              <Text
-                numberOfLines={1}
-                style={{
-                  maxWidth: screenWidth / 12.0,
-                  ...Fonts.whiteColor12Bold,
-                }}>
-                4.7
-              </Text>
-              <MaterialIcons
-                name="star"
-                color={Colors.orangeColor}
-                size={16}
-                style={{marginLeft: Sizes.fixPadding - 5.0}}
-              />
-            </View>
           </ImageBackground>
         </View>
         <Text
@@ -237,7 +221,9 @@ const RatingScreen = ({navigation}) => {
         name="arrow-left"
         size={20}
         color={Colors.blackColor}
-        onPress={() => navigation.pop()}
+        onPress={() => {
+          navigation.push('Home');
+        }}
         style={{
           marginHorizontal: Sizes.fixPadding + 5.0,
           marginVertical: Sizes.fixPadding * 2.0,

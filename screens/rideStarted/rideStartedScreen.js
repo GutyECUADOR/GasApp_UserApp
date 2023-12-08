@@ -30,7 +30,7 @@ const RideStartedScreen = ({navigation}) => {
       <MyStatusBar />
       <View style={{flex: 1}}>
         {directionInfo()}
-        {reachingDestinationInfo()}
+       {/*  {reachingDestinationInfo()} */}
         {header()}
         {driverInfoSheet()}
       </View>
@@ -44,7 +44,6 @@ const RideStartedScreen = ({navigation}) => {
         iterationCount={1}
         duration={1500}
         style={{...styles.bottomSheetWrapStyle}}>
-        {indicator()}
         <ScrollView showsVerticalScrollIndicator={false}>
           {driverInfo()}
         </ScrollView>
@@ -62,10 +61,10 @@ const RideStartedScreen = ({navigation}) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => {
-          navigation.push('RideEnd');
+          navigation.push('Rating');
         }}
         style={styles.buttonStyle}>
-        <Text style={{...Fonts.whiteColor18Bold}}>End Ride</Text>
+        <Text style={{...Fonts.whiteColor18Bold}}>Finalizar</Text>
       </TouchableOpacity>
     );
   }
@@ -97,10 +96,10 @@ const RideStartedScreen = ({navigation}) => {
               alignItems: 'center',
             }}>
             <Text numberOfLines={1} style={{...Fonts.grayColor14Regular}}>
-              Swift Dezire
+              Teléfono
             </Text>
             <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
-              GJ 5 AB 1265
+              0999887477
             </Text>
           </View>
           <View
@@ -110,12 +109,13 @@ const RideStartedScreen = ({navigation}) => {
               alignItems: 'center',
             }}>
             <Text numberOfLines={1} style={{...Fonts.grayColor14Regular}}>
-              Arriving in
+              LLegará en
             </Text>
             <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
-              3 mins
+              15 mins
             </Text>
           </View>
+          
         </View>
       </View>
     );
@@ -129,47 +129,14 @@ const RideStartedScreen = ({navigation}) => {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <View style={styles.callAndMessageIconWrapStyle}>
-          <MaterialIcons
-            name="call"
-            color={Colors.primaryColor}
-            size={screenWidth / 18.0}
-          />
-        </View>
         <View style={{alignItems: 'center', justifyContent: 'center'}}>
           <ImageBackground
-            source={require('../../assets/images/users/user2.png')}
+            source={require('../../assets/images/users/nouser.png')}
             style={styles.driverImageStyle}>
-            <View style={styles.ratingInfoWrapStyle}>
-              <Text
-                numberOfLines={1}
-                style={{
-                  maxWidth: screenWidth / 12.0,
-                  ...Fonts.whiteColor12Bold,
-                }}>
-                4.7
-              </Text>
-              <MaterialIcons
-                name="star"
-                color={Colors.orangeColor}
-                size={16}
-                style={{marginLeft: Sizes.fixPadding - 5.0}}
-              />
-            </View>
+            
           </ImageBackground>
         </View>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => {
-            navigation.push('ChatWithDriver');
-          }}
-          style={styles.callAndMessageIconWrapStyle}>
-          <MaterialIcons
-            name="message"
-            color={Colors.primaryColor}
-            size={screenWidth / 18.0}
-          />
-        </TouchableOpacity>
+        
       </View>
     );
   }
@@ -178,9 +145,9 @@ const RideStartedScreen = ({navigation}) => {
     return (
       <View style={styles.reachingDestinationInfoWrapStyle}>
         <Text style={{...Fonts.grayColor14Regular}}>
-          Reaching Destination in
+          LLegará a tu ubicación en
         </Text>
-        <Text style={{...Fonts.blackColor14SemiBold}}>14 mins</Text>
+        <Text style={{...Fonts.blackColor14SemiBold}}>15 mins</Text>
       </View>
     );
   }
