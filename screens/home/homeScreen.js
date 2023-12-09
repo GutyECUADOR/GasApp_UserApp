@@ -27,37 +27,10 @@ const HomeScreen = ({navigation}) => {
 
   const [backClickCount, setBackClickCount] = useState(0);
   const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([])
-  const { hasLocation, initialPosition, getCurrentLocation, address } = useLocation();
+  const { hasLocation, initialPosition, getCurrentLocation, address, getAddress, location, setlocation } = useLocation();
   const mapViewRef = useRef();
 
-  const getDataRealTimeDB= () => {
-    database()
-      .ref('/notas')
-      .on('value', snapshot => {
-        let responselist = Object.values(snapshot.val())
-       
-        const markers = responselist.map( responselist =>{
-          return {
-            id: responselist["id:"],
-            coordinate: {
-              latitude: responselist["coordinate"]["latitude"],
-              longitude: responselist["coordinate"]["longitude"],
-            }
-          }
-        });
-
-       
-       
-        setDistribuidoresCercanos(markers);
-        console.log('User data: ', responselist);
-        /* console.log('markers: ', objeto1.coordinate.latitude);
-        console.log('markers: ', objeto1.coordinate.longitude); */
-      });
-
-  }
-
   useEffect(() => {
- 
     const subscriber = firestore()
     .collection('distribuidores').where('isActivo', '==', true)
     .onSnapshot(querySnapshot => {
@@ -84,6 +57,7 @@ const HomeScreen = ({navigation}) => {
 
   const centerPosition = async () => {
     const { latitude, longitude } = await getCurrentLocation()
+    setlocation({latitude, longitude});
     console.log('Centrando posición', latitude, longitude);
     mapViewRef.current?.animateCamera({
       center: {
@@ -93,6 +67,11 @@ const HomeScreen = ({navigation}) => {
       }
     })
   };
+
+  useEffect(() => {
+      getAddress()
+  }, [location])
+  
 
   const backAction = () => {
     if (Platform.OS === 'ios') {
@@ -169,7 +148,6 @@ const HomeScreen = ({navigation}) => {
       <View style={{flex: 1}}>
         {displayMap()}
         {currentLocationWithMenuIcon()}
-        {/*  {nearestLocationsSheet()} */}
         {continueButton()}
       </View>
       {exitInfo()}
@@ -284,7 +262,7 @@ const HomeScreen = ({navigation}) => {
           zoomEnabled={true}
           minZoomLevel={15}
           zoomControlEnabled={true}
-          showsUserLocation={false}
+          showsUserLocation={true}
           region={{
             latitude: initialPosition.latitude,
             longitude: initialPosition.longitude,
@@ -294,7 +272,10 @@ const HomeScreen = ({navigation}) => {
           style={{height: '100%'}}
           provider={PROVIDER_GOOGLE}>
           {distribuidoresCercanos.map((item, index) => (
-            <Marker key={`${index}`} coordinate={ item.coordinate }>
+            <Marker key={`${index}`} coordinate={ item.coordinate }
+              title='Delivery Cercano'
+              description='Este delivery está activo'
+              >
               <Image
                 source={require('../../assets/images/icons/cilindro_amarillo.png')}
                 style={{
@@ -304,10 +285,14 @@ const HomeScreen = ({navigation}) => {
               />
             </Marker>
           ))}
-          <Marker 
-            coordinate={initialPosition}
+          <Marker
+            draggable={true}
+            coordinate={location}
             title='Solicitar aqui'
             description='El delivery llegará a esta ubicación'
+            onDragEnd={ (event)=> {
+              setlocation(event.nativeEvent.coordinate);
+            }}
           
           >
             {/* <Image

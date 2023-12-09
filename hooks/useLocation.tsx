@@ -14,6 +14,10 @@ export const useLocation = () => {
         latitude: 0,
         longitude: 0
     })
+    const [location, setlocation] = useState<Location>({
+      latitude: 0,
+      longitude: 0
+  })
 
     Geocoder.init(Key.apiKey); // TODO - use a valid API key from ConfigFILE
 
@@ -32,21 +36,24 @@ export const useLocation = () => {
       });
     } 
 
-    
+    const getAddress = (Location: Location) => {
+      // Search by geo-location (reverse geo-code)
+      Geocoder.from(Location)
+      .then(json => {
+        const addressFormatted = json.results[0].formatted_address;
+        setAddress(addressFormatted);
+      })
+      .catch(error => console.warn(error));
+    }
 
     useEffect(() => {
       getCurrentLocation().then( location => {
         setInitialPosition(location);
+        setlocation(location);
         sethasLocation(true);
         console.log(location);
-
-        // Search by geo-location (reverse geo-code)
-        Geocoder.from(location)
-        .then(json => {
-          const addressFormatted = json.results[0].formatted_address;
-          setAddress(addressFormatted);
-        })
-        .catch(error => console.warn(error));
+        getAddress(location);
+        
       });
     }, [])
 
@@ -56,6 +63,9 @@ export const useLocation = () => {
     hasLocation,
     initialPosition,
     getCurrentLocation,
-    address
+    address,
+    getAddress,
+    location,
+    setlocation
   }
 }
