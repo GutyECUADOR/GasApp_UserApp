@@ -68,10 +68,7 @@ const HomeScreen = ({navigation}) => {
     })
   };
 
-  useEffect(() => {
-      getAddress()
-  }, [location])
-  
+ 
 
   const backAction = () => {
     if (Platform.OS === 'ios') {
@@ -291,7 +288,11 @@ const HomeScreen = ({navigation}) => {
             title='Solicitar aqui'
             description='El delivery llegará a esta ubicación'
             onDragEnd={ (event)=> {
-              setlocation(event.nativeEvent.coordinate);
+              const latitude = event.nativeEvent.coordinate.latitude;
+              const longitude = event.nativeEvent.coordinate.longitude;
+              console.log('EnDragLAT:' + event.nativeEvent.coordinate.latitude);
+              console.log('EnDragLONG:' + event.nativeEvent.coordinate.longitude);
+              setlocation({latitude, longitude});
             }}
           
           >

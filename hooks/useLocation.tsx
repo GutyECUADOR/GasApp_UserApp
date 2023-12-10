@@ -37,7 +37,6 @@ export const useLocation = () => {
     } 
 
     const getAddress = () => {
-      // Search by geo-location (reverse geo-code)
       Geocoder.from(location)
       .then(json => {
         const addressFormatted = json.results[0].formatted_address;
@@ -51,11 +50,13 @@ export const useLocation = () => {
         setInitialPosition(location);
         setlocation(location);
         sethasLocation(true);
-        console.log(location);
-        getAddress();
-        
       });
     }, [])
+
+    useEffect(() => {
+      getAddress()
+  }, [location])
+  
 
   
 

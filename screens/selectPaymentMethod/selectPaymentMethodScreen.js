@@ -22,6 +22,7 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import BottomSheet from 'react-native-simple-bottom-sheet';
 import * as Animatable from 'react-native-animatable';
 import MyStatusBar from '../../components/myStatusBar';
+import { useLocation } from '../../hooks/useLocation';
 
 const paymentmethods = [
   {
@@ -40,12 +41,13 @@ const paymentmethods = [
 
 const SelectPaymentMethodScreen = ({navigation}) => {
   const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] = useState(0);
+  const { hasLocation, initialPosition, getCurrentLocation, address, getAddress, location, setlocation } = useLocation();
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
       <MyStatusBar />
       <View style={{flex: 1}}>
-        {directionInfo()}
+        {displayMap()}
         {header()}
         {paymentSheet()}
         {bookRideButton()}
@@ -186,7 +188,7 @@ const SelectPaymentMethodScreen = ({navigation}) => {
             marginLeft: Sizes.fixPadding + 5.0,
             ...Fonts.blackColor15SemiBold,
           }}>
-          1655 Island Pkwy, Kamloops, BC V2B 6Y9
+          { address }
         </Text>
       </View>
     );
@@ -252,36 +254,32 @@ const SelectPaymentMethodScreen = ({navigation}) => {
     );
   }
 
-  function directionInfo() {
-    const currentCabLocation = {
-      latitude: 22.715024,
-      longitude: 88.474119,
+  function displayMap() {
+    const distribuidorLocation = {
+      latitude: -0.203525, 
+      longitude: -78.483344
     };
-    const userLocation = {
-      latitude: 22.558488,
-      longitude: 88.309215,
-    };
+    
     return (
       <MapView
         region={{
-          latitude: 22.476297,
-          longitude: 88.344783,
-          latitudeDelta: 0.5,
-          longitudeDelta: 0.5,
+          latitude: initialPosition.latitude,
+          longitude: initialPosition.longitude,
+          latitudeDelta: 0.15,
+          longitudeDelta: 0.15,
         }}
         style={{height: '100%'}}
-        provider={PROVIDER_GOOGLE}
-        mapType="terrain">
+        provider={PROVIDER_GOOGLE}>
         <MapViewDirections
-          origin={userLocation}
-          destination={currentCabLocation}
+          origin={distribuidorLocation}
+          destination={location}
           apikey={Key.apiKey}
           strokeColor={Colors.primaryColor}
           strokeWidth={3}
         />
-        <Marker coordinate={currentCabLocation}>
+        <Marker coordinate={distribuidorLocation}>
           <Image
-            source={require('../../assets/images/icons/marker2.png')}
+            source={require('../../assets/images/icons/cilindro_amarillo.png')}
             style={{width: 50.0, height: 50.0, resizeMode: 'stretch'}}
           />
           <Callout>
@@ -300,7 +298,7 @@ const SelectPaymentMethodScreen = ({navigation}) => {
             </View>
           </Callout>
         </Marker>
-        <Marker coordinate={userLocation}>
+        <Marker coordinate={location}>
           <Image
             source={require('../../assets/images/icons/marker3.png')}
             style={{width: 23.0, height: 23.0}}
