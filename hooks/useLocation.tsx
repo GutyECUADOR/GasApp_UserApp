@@ -8,10 +8,6 @@ export const useLocation = () => {
 
     const [hasLocation, sethasLocation] = useState(false); 
     const [address, setAddress] = useState('Mi ubicación actual')
-    const [initialPosition, setInitialPosition] = useState<Location>({
-        latitude: 0,
-        longitude: 0
-    })
     const [location, setlocation] = useState<Location>({
       latitude: 0,
       longitude: 0
@@ -45,7 +41,6 @@ export const useLocation = () => {
 
     useEffect(() => {
       getCurrentLocation().then( location => {
-        setInitialPosition(location);
         setlocation(location);
         sethasLocation(true);
       });
@@ -60,7 +55,6 @@ export const useLocation = () => {
 
   return {
     hasLocation,
-    initialPosition,
     getCurrentLocation,
     address,
     getAddress,

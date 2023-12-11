@@ -10,7 +10,7 @@ import {
   Button,
   ActivityIndicator
 } from 'react-native';
-import React, {useState, useEffect, useCallback, useRef} from 'react';
+import React, {useState, useEffect, useCallback, useRef, useContext} from 'react';
 import {Colors, Fonts, Sizes, screenHeight} from '../../constants/styles';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import {Overlay} from '@rneui/themed';
@@ -22,12 +22,16 @@ import { useLocation } from '../../hooks/useLocation';
 
 //import database from '@react-native-firebase/database';
 import firestore from '@react-native-firebase/firestore';
+import { LocationContext } from '../../context/LocationContext';
 
 const HomeScreen = ({navigation}) => {
 
   const [backClickCount, setBackClickCount] = useState(0);
   const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([])
-  const { hasLocation, initialPosition, getCurrentLocation, address, getAddress, location, setlocation } = useLocation();
+  const { hasLocation, address, getAddress, location, setlocation } = useLocation();
+
+  const { locationState, getCurrentLocation } = useContext(LocationContext);
+
   const mapViewRef = useRef();
 
   useEffect(() => {
@@ -261,8 +265,8 @@ const HomeScreen = ({navigation}) => {
           zoomControlEnabled={true}
           showsUserLocation={true}
           region={{
-            latitude: initialPosition.latitude,
-            longitude: initialPosition.longitude,
+            latitude: location.latitude,
+            longitude: location.longitude,
             latitudeDelta: 0.15,
             longitudeDelta: 0.15,
           }}

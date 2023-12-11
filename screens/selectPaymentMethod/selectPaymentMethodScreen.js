@@ -43,7 +43,7 @@ const paymentmethods = [
 
 const SelectPaymentMethodScreen = ({navigation}) => {
   const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] = useState(0);
-  const { hasLocation, initialPosition, getCurrentLocation, address, getAddress, location, setlocation } = useLocation();
+  const { hasLocation, getCurrentLocation, address, getAddress, location, setlocation } = useLocation();
   const { locationState } = useContext(LocationContext);
 
   return (
@@ -266,8 +266,8 @@ const SelectPaymentMethodScreen = ({navigation}) => {
     return (
       <MapView
         region={{
-          latitude: initialPosition.latitude,
-          longitude: initialPosition.longitude,
+          latitude: location.latitude,
+          longitude: location.longitude,
           latitudeDelta: 0.15,
           longitudeDelta: 0.15,
         }}

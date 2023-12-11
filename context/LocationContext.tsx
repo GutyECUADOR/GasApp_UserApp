@@ -15,7 +15,8 @@ export const locationInitialState: LocationState = {
 export interface LocationContextProps {
     locationState: LocationState;
     getCurrentLocation: () => Promise<Location>;
-    getAddress: () => void;
+    getAddress: () => Promise<void>;
+    setlocation: (location: Location) => void;
 }
 
 export const LocationContext = createContext({} as LocationContextProps);
@@ -24,28 +25,45 @@ export const LocationContext = createContext({} as LocationContextProps);
 /* Exponer el Proveedor de informacion */
 export const LocationProvider = ({ children }: any) => {
 
-    const [state, dispatch] = useReducer(LocationReducer, locationInitialState)
+    const [locationState, dispatch] = useReducer(LocationReducer, locationInitialState)
 
     const getCurrentLocation = (): Promise<Location> => {
         return new Promise( (resolve, reject) => {
-        
-        });
+            Geolocation.getCurrentPosition(
+              info => {
+                const location: Location = {
+                    latitude: info.coords.latitude,
+                    longitude: info.coords.longitude
+                }
+                dispatch({type: 'setLocation', payload: {location}})
+                resolve(location);
+              },
+              error => { reject(error)},{
+                enableHighAccuracy: true
+              });
+          });
     }
     
     const getAddress = () => {
-        Geocoder.from(state.location)
+        const address = Geocoder.from(locationState.location)
         .then(json => {
           const addressFormatted = json.results[0].formatted_address;
-          //setAddress(addressFormatted);
+          dispatch({type: 'setAddress', payload: addressFormatted})
         })
         .catch(error => console.warn(error));
+        return address;
+    }
+
+    const setlocation = (location: Location) => {
+        dispatch({type: 'setLocation', payload: {location}})
     }
 
     return (
         <LocationContext.Provider value={{
-            locationState: locationInitialState,
+            locationState,
             getCurrentLocation,
-            getAddress
+            getAddress,
+            setlocation
         }}>
             { children }
         </LocationContext.Provider>

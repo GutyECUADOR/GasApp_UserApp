@@ -7,16 +7,25 @@ export interface LocationState {
     deliveryLocation: Location;
 }
 
-type AuthAction = | 
-    { type: 'getLocation', payload: null}
-    | { type: 'addError', payload: string }
+type LocationAction = | 
+    { type: 'setLocation', payload: { location: Location }}
+    | { type: 'setAddress', payload: string }
 
-export const LocationReducer = ( state: LocationState, action: AuthAction) : LocationState => {
+/* El reducer hace las vaces de useState complejo */
+
+export const LocationReducer = ( state: LocationState, action: LocationAction) : LocationState => {
     switch (action.type) {
-        case 'getLocation':
+        case 'setLocation':
             return {
                 ...state,
-              
+                location: action.payload.location
+            }
+            break;
+
+        case 'setAddress':
+            return {
+                ...state,
+                address: action.payload
             }
             break;
 
