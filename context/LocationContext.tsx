@@ -2,13 +2,17 @@ import React, { createContext, useReducer, useEffect} from 'react';
 import { Location } from '../interfaces/Location';
 import { LocationReducer, LocationState } from './LocationReducer';
 import Geolocation from '@react-native-community/geolocation';
+import Geocoder from 'react-native-geocoding';
 
 /* Estado Inicial */
 export const locationInitialState: LocationState = {
     hasLocation: false,
-    address: 'Ubicación Actual desde Context',
+    address: 'Mi Ubicación Actual',
     location: {latitude: 0, longitude: 0},
-    deliveryLocation: {latitude: 0, longitude: 0}
+    deliveryLocation: { 
+        latitude: -0.203525, 
+        longitude: -78.483344
+    }
 }
 
 /* Interface que espone que metodos y propiedades expondra el context */
@@ -57,6 +61,21 @@ export const LocationProvider = ({ children }: any) => {
     const setlocation = (location: Location) => {
         dispatch({type: 'setLocation', payload: {location}})
     }
+
+    const sethasLocation = (hasLocation: boolean) => {
+        dispatch({type: 'sethasLocation', payload: hasLocation})
+    }
+
+    useEffect(() => {
+        getCurrentLocation().then( location => {
+          setlocation(location);
+          sethasLocation(true);
+        });
+    }, [])
+
+    useEffect(() => {
+        getAddress()
+    }, [locationState.location])
 
     return (
         <LocationContext.Provider value={{

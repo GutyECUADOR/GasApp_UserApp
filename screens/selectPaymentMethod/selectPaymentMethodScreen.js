@@ -43,8 +43,8 @@ const paymentmethods = [
 
 const SelectPaymentMethodScreen = ({navigation}) => {
   const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] = useState(0);
-  const { hasLocation, getCurrentLocation, address, getAddress, location, setlocation } = useLocation();
-  const { locationState } = useContext(LocationContext);
+  
+  const { locationState, setlocation, getCurrentLocation } = useContext(LocationContext);
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
@@ -191,7 +191,7 @@ const SelectPaymentMethodScreen = ({navigation}) => {
             marginLeft: Sizes.fixPadding + 5.0,
             ...Fonts.blackColor15SemiBold,
           }}>
-          { address }
+          { locationState.address }
         </Text>
       </View>
     );
@@ -258,35 +258,31 @@ const SelectPaymentMethodScreen = ({navigation}) => {
   }
 
   function displayMap() {
-    const distribuidorLocation = {
-      latitude: -0.203525, 
-      longitude: -78.483344
-    };
     
     return (
       <MapView
         region={{
-          latitude: location.latitude,
-          longitude: location.longitude,
+          latitude: locationState.location.latitude,
+          longitude: locationState.location.longitude,
           latitudeDelta: 0.15,
           longitudeDelta: 0.15,
         }}
         style={{height: '100%'}}
         provider={PROVIDER_GOOGLE}>
         <MapViewDirections
-          origin={distribuidorLocation}
-          destination={location}
+          origin={locationState.deliveryLocation}
+          destination={locationState.location}
           apikey={Key.apiKey}
           strokeColor={Colors.primaryColor}
           strokeWidth={3}
         />
-        <Marker coordinate={distribuidorLocation}>
+        <Marker coordinate={locationState.deliveryLocation}>
           <Image
             source={require('../../assets/images/icons/cilindro_amarillo.png')}
             style={{width: 50.0, height: 50.0, resizeMode: 'stretch'}}
           />
         </Marker>
-        <Marker coordinate={location}>
+        <Marker coordinate={locationState.location}>
           <Image
             source={require('../../assets/images/icons/marker3.png')}
             style={{width: 23.0, height: 23.0}}

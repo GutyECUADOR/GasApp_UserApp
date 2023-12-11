@@ -10,6 +10,7 @@ export interface LocationState {
 type LocationAction = | 
     { type: 'setLocation', payload: { location: Location }}
     | { type: 'setAddress', payload: string }
+    | { type: 'sethasLocation', payload: boolean }
 
 /* El reducer hace las vaces de useState complejo */
 
@@ -26,6 +27,13 @@ export const LocationReducer = ( state: LocationState, action: LocationAction) :
             return {
                 ...state,
                 address: action.payload
+            }
+            break;
+        
+        case 'sethasLocation':
+            return {
+                ...state,
+                hasLocation: action.payload
             }
             break;
 

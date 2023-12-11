@@ -28,9 +28,9 @@ const HomeScreen = ({navigation}) => {
 
   const [backClickCount, setBackClickCount] = useState(0);
   const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([])
-  const { hasLocation, address, getAddress, location, setlocation } = useLocation();
+  const { hasLocation, address, location } = useLocation();
 
-  const { locationState, getCurrentLocation } = useContext(LocationContext);
+  const { locationState, setlocation, getCurrentLocation } = useContext(LocationContext);
 
   const mapViewRef = useRef();
 
@@ -193,7 +193,7 @@ const HomeScreen = ({navigation}) => {
               flex: 1,
               ...Fonts.blackColor15SemiBold,
             }}>
-            {address} 
+            {locationState.address} 
           </Text>
         </View>
         {currentLocationIcon()}
@@ -288,7 +288,7 @@ const HomeScreen = ({navigation}) => {
           ))}
           <Marker
             draggable={true}
-            coordinate={location}
+            coordinate={locationState.location}
             title='Solicitar aqui'
             description='El delivery llegará a esta ubicación'
             onDragEnd={ (event)=> {
