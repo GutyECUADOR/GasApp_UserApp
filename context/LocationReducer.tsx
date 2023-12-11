@@ -5,18 +5,37 @@ export interface LocationState {
     address: string;
     location: Location;
     deliveryLocation: Location;
+    isPedidoActivo: boolean;
+    duration: number;
+    distance: number;
+    amount: number;
+
 }
+
+
 
 type LocationAction = | 
     { type: 'setLocation', payload: { location: Location }}
     | { type: 'setAddress', payload: string }
+    | { type: 'setDeliverylocation', payload: { location: Location } }
     | { type: 'sethasLocation', payload: boolean }
+    | { type: 'setHasPedidoActivo', payload: boolean }
+    | { type: 'setAmount', payload: number }
+    | { type: 'setDistance', payload: number }
+    | { type: 'setDuration', payload: number }
 
 /* El reducer hace las vaces de useState complejo */
 
 export const LocationReducer = ( state: LocationState, action: LocationAction) : LocationState => {
     switch (action.type) {
         case 'setLocation':
+            return {
+                ...state,
+                location: action.payload.location
+            }
+            break;
+
+        case 'setDeliverylocation':
             return {
                 ...state,
                 location: action.payload.location
@@ -34,6 +53,34 @@ export const LocationReducer = ( state: LocationState, action: LocationAction) :
             return {
                 ...state,
                 hasLocation: action.payload
+            }
+            break;
+
+        case 'setHasPedidoActivo':
+            return {
+                ...state,
+                isPedidoActivo: action.payload
+            }
+            break;
+
+        case 'setAmount':
+            return {
+                ...state,
+                amount: action.payload
+            }
+            break;
+
+        case 'setDistance':
+            return {
+                ...state,
+                distance: action.payload
+            }
+            break;
+
+        case 'setDuration':
+            return {
+                ...state,
+                duration: action.payload
             }
             break;
 

@@ -18,7 +18,6 @@ import BottomSheet from 'react-native-simple-bottom-sheet';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useFocusEffect} from '@react-navigation/native';
 import MyStatusBar from '../../components/myStatusBar';
-import { useLocation } from '../../hooks/useLocation';
 
 //import database from '@react-native-firebase/database';
 import firestore from '@react-native-firebase/firestore';
@@ -28,9 +27,8 @@ const HomeScreen = ({navigation}) => {
 
   const [backClickCount, setBackClickCount] = useState(0);
   const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([])
-  const { hasLocation, address, location } = useLocation();
 
-  const { locationState, setlocation, getAddress, getCurrentLocation } = useContext(LocationContext);
+  const { locationState, setLocation, getAddress, getCurrentLocation } = useContext(LocationContext);
 
   const mapViewRef = useRef();
 
@@ -66,7 +64,7 @@ const HomeScreen = ({navigation}) => {
 
   const centerPosition = async () => {
     const { latitude, longitude } = await getCurrentLocation()
-    setlocation({latitude, longitude});
+    setLocation({latitude, longitude});
     console.log('Centrando posición', latitude, longitude);
     mapViewRef.current?.animateCamera({
       center: {
@@ -110,7 +108,7 @@ const HomeScreen = ({navigation}) => {
 
   function loadingDialog() {
     return (
-      <Overlay isVisible={!hasLocation} overlayStyle={styles.dialogStyle}>
+      <Overlay isVisible={!locationState.hasLocation} overlayStyle={styles.dialogStyle}>
         <ActivityIndicator
           size={56}
           color={Colors.primaryColor}
@@ -271,8 +269,8 @@ const HomeScreen = ({navigation}) => {
           zoomControlEnabled={true}
           showsUserLocation={true}
           region={{
-            latitude: location.latitude,
-            longitude: location.longitude,
+            latitude: locationState.location.latitude,
+            longitude: locationState.location.longitude,
             latitudeDelta: 0.15,
             longitudeDelta: 0.15,
           }}
@@ -300,7 +298,7 @@ const HomeScreen = ({navigation}) => {
             onDragEnd={ (event)=> {
               const latitude = event.nativeEvent.coordinate.latitude;
               const longitude = event.nativeEvent.coordinate.longitude;
-              setlocation({latitude, longitude});
+              setLocation({latitude, longitude});
             }}
           
           >

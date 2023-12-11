@@ -3,16 +3,31 @@ import { Location } from '../interfaces/Location';
 import { LocationReducer, LocationState } from './LocationReducer';
 import Geolocation from '@react-native-community/geolocation';
 import Geocoder from 'react-native-geocoding';
+import {Key} from '../constants/key';
+
+export class LocationClass implements Location {
+    latitude: number;
+    longitude: number;
+
+    constructor(latitude: number, longitude: number) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+   
+
+}
 
 /* Estado Inicial */
 export const locationInitialState: LocationState = {
     hasLocation: false,
     address: 'Mi Ubicación Actual',
-    location: {latitude: 0, longitude: 0},
-    deliveryLocation: { 
-        latitude: -0.203525, 
-        longitude: -78.483344
-    }
+    location: new LocationClass(0, 0),
+    deliveryLocation: new LocationClass(-0.203525, -78.483344),
+    isPedidoActivo: false,
+    amount: 0,
+    distance: 0,
+    duration: 0
+   
 }
 
 /* Interface que espone que metodos y propiedades expondra el context */
@@ -20,7 +35,13 @@ export interface LocationContextProps {
     locationState: LocationState;
     getCurrentLocation: () => Promise<Location>;
     getAddress: () => Promise<void>;
-    setlocation: (location: Location) => void;
+    setLocation: (location: Location) => void;
+    setDeliveryLocation: (location: Location) => void;
+    setHasLocation: (hasLocation: boolean) => void;
+    setHasPedidoActivo: (hasLocation: boolean) => void;
+    setAmount: (amount: number) => void;
+    setDistance: (distance: number) => void;
+    setDuration: (duration: number) => void;
 }
 
 export const LocationContext = createContext({} as LocationContextProps);
@@ -58,17 +79,38 @@ export const LocationProvider = ({ children }: any) => {
         return address;
     }
 
-    const setlocation = (location: Location) => {
+    const setLocation = (location: Location) => {
         dispatch({type: 'setLocation', payload: {location}})
     }
 
-    const sethasLocation = (hasLocation: boolean) => {
+    const setDeliveryLocation = (location: Location) => {
+        dispatch({type: 'setDeliverylocation', payload: {location}})
+    }
+
+    const setHasLocation = (hasLocation: boolean) => {
         dispatch({type: 'sethasLocation', payload: hasLocation})
     }
 
+    const setHasPedidoActivo = (hasLocation: boolean) => {
+        dispatch({type: 'setHasPedidoActivo', payload: hasLocation})
+    }
+
+    const setAmount = (amount: number) => {
+        dispatch({type: 'setAmount', payload: amount})
+    }
+
+    const setDistance = (amount: number) => {
+        dispatch({type: 'setDistance', payload: amount})
+    }
+
+    const setDuration = (amount: number) => {
+        dispatch({type: 'setDuration', payload: amount})
+    }
+
     useEffect(() => {
+        Geocoder.init(Key.apiKey); // TODO - use a valid API key from ConfigFILE
         getCurrentLocation().then( location => {
-          sethasLocation(true);
+          setHasLocation(true);
         });
     }, [])
 
@@ -79,9 +121,15 @@ export const LocationProvider = ({ children }: any) => {
     return (
         <LocationContext.Provider value={{
             locationState,
+            setLocation,
+            setDeliveryLocation,
+            setHasLocation,
+            setHasPedidoActivo,
             getCurrentLocation,
             getAddress,
-            setlocation
+            setAmount,
+            setDistance,
+            setDuration
         }}>
             { children }
         </LocationContext.Provider>

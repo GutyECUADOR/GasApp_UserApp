@@ -22,7 +22,6 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import BottomSheet from 'react-native-simple-bottom-sheet';
 import * as Animatable from 'react-native-animatable';
 import MyStatusBar from '../../components/myStatusBar';
-import { useLocation } from '../../hooks/useLocation';
 import { LocationContext } from '../../context/LocationContext';
 
 
@@ -44,7 +43,7 @@ const paymentmethods = [
 const SelectPaymentMethodScreen = ({navigation}) => {
   const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] = useState(0);
   
-  const { locationState, setlocation, getCurrentLocation } = useContext(LocationContext);
+  const { locationState, setDistance, setDuration } = useContext(LocationContext);
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
@@ -80,8 +79,9 @@ const SelectPaymentMethodScreen = ({navigation}) => {
               iterationCount={1}
               duration={1500}
               style={{flex: 1}}>
-             
               {dropLocationInfo()}
+              {currentToDropLocDivider()}
+              {currentLocationInfo()}
               {paymentMethodsInfo()}
             </Animatable.View>
           </ScrollView>
@@ -206,9 +206,6 @@ const SelectPaymentMethodScreen = ({navigation}) => {
           alignItems: 'center',
         }}>
         <View style={{width: 24.0, alignItems: 'center'}}>
-          <Text style={{...Fonts.blackColor8SemiBold, lineHeight: 6}}>
-            •{`\n`}•{`\n`}•{`\n`}•{`\n`}•{`\n`}•{`\n`}•
-          </Text>
         </View>
         <View style={styles.currentToDropLocationInfoDividerStyle} />
       </View>
@@ -230,7 +227,8 @@ const SelectPaymentMethodScreen = ({navigation}) => {
             flex: 1,
             ...Fonts.blackColor15SemiBold,
           }}>
-          9 Bailey Drive, Fredericton, NB E3B 5A3
+            { locationState.distance.toFixed(2) } Km - 
+            { locationState.duration.toFixed(2) } min
         </Text>
       </View>
     );
@@ -275,6 +273,11 @@ const SelectPaymentMethodScreen = ({navigation}) => {
           apikey={Key.apiKey}
           strokeColor={Colors.primaryColor}
           strokeWidth={3}
+
+          onReady={ mapViewDirectionsResults =>{
+            setDistance( mapViewDirectionsResults.distance);
+            setDuration( mapViewDirectionsResults.duration);
+          }}
         />
         <Marker coordinate={locationState.deliveryLocation}>
           <Image
