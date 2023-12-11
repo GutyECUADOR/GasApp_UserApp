@@ -3,8 +3,6 @@ import Geolocation from '@react-native-community/geolocation';
 import { Location } from "../interfaces/Location";
 import Geocoder from 'react-native-geocoding';
 import {Key} from '../constants/key';
-import Config from "react-native-config";
-
 
 export const useLocation = () => {
 
