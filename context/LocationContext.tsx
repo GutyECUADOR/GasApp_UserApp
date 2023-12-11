@@ -3,39 +3,32 @@ import { Location } from '../interfaces/Location';
 import { LocationReducer, LocationState } from './LocationReducer';
 import Geolocation from '@react-native-community/geolocation';
 
-type LocationContextProps = {
-    hasLocation: boolean;
-    address: string;
-    location: Location;
-    
+/* Estado Inicial */
+export const locationInitialState: LocationState = {
+    hasLocation: false,
+    address: 'Ubicación Actual desde Context',
+    location: {latitude: 0, longitude: 0},
+    deliveryLocation: {latitude: 0, longitude: 0}
+}
+
+/* Interface que espone que metodos y propiedades expondra el context */
+export interface LocationContextProps {
+    locationState: LocationState;
     getCurrentLocation: () => Promise<Location>;
     getAddress: () => void;
 }
 
-const LocationInitialState: LocationState = {
-    hasLocation: false,
-    address: 'Ubicación Actual',
-    location: {latitude: 0, longitude: 0}
-}
-
 export const LocationContext = createContext({} as LocationContextProps);
 
-export const AuthProvider = ({ children }:any) => {
 
-    const [state, dispatch] = useReducer(LocationReducer, LocationInitialState)
+/* Exponer el Proveedor de informacion */
+export const LocationProvider = ({ children }: any) => {
+
+    const [state, dispatch] = useReducer(LocationReducer, locationInitialState)
 
     const getCurrentLocation = (): Promise<Location> => {
         return new Promise( (resolve, reject) => {
-          Geolocation.getCurrentPosition(
-            info => {
-              resolve({
-                  latitude: info.coords.latitude,
-                  longitude: info.coords.longitude
-              });
-            },
-            error => { reject(error)},{
-              enableHighAccuracy: true
-            });
+        
         });
     }
     
@@ -46,11 +39,11 @@ export const AuthProvider = ({ children }:any) => {
           //setAddress(addressFormatted);
         })
         .catch(error => console.warn(error));
-      }
+    }
 
     return (
         <LocationContext.Provider value={{
-            ...state,
+            locationState: locationInitialState,
             getCurrentLocation,
             getAddress
         }}>

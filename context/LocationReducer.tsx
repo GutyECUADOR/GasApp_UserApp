@@ -4,6 +4,7 @@ export interface LocationState {
     hasLocation: boolean;
     address: string;
     location: Location;
+    deliveryLocation: Location;
 }
 
 type AuthAction = | 
