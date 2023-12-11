@@ -30,7 +30,7 @@ const HomeScreen = ({navigation}) => {
   const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([])
   const { hasLocation, address, location } = useLocation();
 
-  const { locationState, setlocation, getCurrentLocation } = useContext(LocationContext);
+  const { locationState, setlocation, getAddress, getCurrentLocation } = useContext(LocationContext);
 
   const mapViewRef = useRef();
 
@@ -58,6 +58,11 @@ const HomeScreen = ({navigation}) => {
     // Unsubscribe from events when no longer in use
     return () => subscriber();
   }, []);
+
+  useEffect(() => {
+    getAddress();
+  }, [])
+  
 
   const centerPosition = async () => {
     const { latitude, longitude } = await getCurrentLocation()
@@ -130,11 +135,12 @@ const HomeScreen = ({navigation}) => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => {
+        onPress={ async () => {
+          await getAddress();
           navigation.push('SelectPaymentMethod');
         }}
         style={styles.buttonStyle}>
-        <Text style={{...Fonts.whiteColor18Bold}}>Solicitar cilindro</Text>
+        <Text style={{...Fonts.whiteColor18Bold}}>Solicitar</Text>
       </TouchableOpacity>
     );
   }
@@ -294,8 +300,6 @@ const HomeScreen = ({navigation}) => {
             onDragEnd={ (event)=> {
               const latitude = event.nativeEvent.coordinate.latitude;
               const longitude = event.nativeEvent.coordinate.longitude;
-              console.log('EnDragLAT:' + event.nativeEvent.coordinate.latitude);
-              console.log('EnDragLONG:' + event.nativeEvent.coordinate.longitude);
               setlocation({latitude, longitude});
             }}
           

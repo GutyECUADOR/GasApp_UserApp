@@ -68,7 +68,6 @@ export const LocationProvider = ({ children }: any) => {
 
     useEffect(() => {
         getCurrentLocation().then( location => {
-          setlocation(location);
           sethasLocation(true);
         });
     }, [])
