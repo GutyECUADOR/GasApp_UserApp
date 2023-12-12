@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   Platform,
   Button,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import React, {useState, useEffect, useCallback, useRef, useContext} from 'react';
 import {Colors, Fonts, Sizes, screenHeight} from '../../constants/styles';
@@ -18,23 +19,28 @@ import BottomSheet from 'react-native-simple-bottom-sheet';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useFocusEffect} from '@react-navigation/native';
 import MyStatusBar from '../../components/myStatusBar';
+import { getDistance } from 'geolib';
 
 //import database from '@react-native-firebase/database';
 import firestore from '@react-native-firebase/firestore';
-import { LocationContext } from '../../context/LocationContext';
+import { LocationClass, LocationContext } from '../../context/LocationContext';
 
 const HomeScreen = ({navigation}) => {
 
   const [backClickCount, setBackClickCount] = useState(0);
   const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([])
 
-  const { locationState, setLocation, getAddress, getCurrentLocation } = useContext(LocationContext);
+  const { locationState, setLocation, setDeliveryLocation, getAddress, getCurrentLocation } = useContext(LocationContext);
 
   const mapViewRef = useRef();
 
+  const sortByDistance = (array) => {
+    return array.sort((a, b) => a.distance - b.distance);
+  }
+
   useEffect(() => {
     const subscriber = firestore()
-    .collection('distribuidores').where('isActivo', '==', true)
+    .collection('distribuidores').where('isActivo', '==', true).limit(10)
     .onSnapshot(querySnapshot => {
       const markers = [];
 
@@ -48,14 +54,21 @@ const HomeScreen = ({navigation}) => {
         });
       });
 
-      console.log('Markers Distribuidores: ', markers);
-      setDistribuidoresCercanos(markers);
+      const distanceMarkers = markers.map( location => {
+        const distance = getDistance(locationState.location, location.coordinate);
+        location.distance = distance;
+        return location
+      });
+
+     /*  console.log('Markers Distribuidores: ', distanceMarkers); */
+
+      setDistribuidoresCercanos(distanceMarkers);
      
     });
 
     // Unsubscribe from events when no longer in use
     return () => subscriber();
-  }, []);
+  }, [locationState.location]);
 
   useEffect(() => {
     getAddress();
@@ -65,7 +78,6 @@ const HomeScreen = ({navigation}) => {
   const centerPosition = async () => {
     const { latitude, longitude } = await getCurrentLocation()
     setLocation({latitude, longitude});
-    console.log('Centrando posición', latitude, longitude);
     mapViewRef.current?.animateCamera({
       center: {
           latitude,
@@ -134,7 +146,20 @@ const HomeScreen = ({navigation}) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={ async () => {
-          await getAddress();
+          if (distribuidoresCercanos.length <= 0) {
+            Alert.alert('Sin repartidores', 'No existen deliverys disponibles en este momento. Intenta en unos minutos.', [ {
+              text: 'Aceptar'
+            }]);
+            return;
+          }
+          
+          const deliveryLocationByDistance = sortByDistance(distribuidoresCercanos);
+          //console.log('deliveryLocationByDistance', deliveryLocationByDistance)
+          const latitude = deliveryLocationByDistance[0].coordinate.latitude;
+          const longitude = deliveryLocationByDistance[0].coordinate.longitude;
+          const closestLocation = {latitude, longitude};
+          console.log(deliveryLocationByDistance)
+          await setDeliveryLocation(closestLocation);
           navigation.push('SelectPaymentMethod');
         }}
         style={styles.buttonStyle}>

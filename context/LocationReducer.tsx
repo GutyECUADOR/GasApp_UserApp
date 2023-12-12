@@ -38,7 +38,7 @@ export const LocationReducer = ( state: LocationState, action: LocationAction) :
         case 'setDeliverylocation':
             return {
                 ...state,
-                location: action.payload.location
+                deliveryLocation: action.payload.location
             }
             break;
 

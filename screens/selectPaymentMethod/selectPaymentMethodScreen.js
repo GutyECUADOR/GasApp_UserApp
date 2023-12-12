@@ -279,13 +279,19 @@ const SelectPaymentMethodScreen = ({navigation}) => {
             setDuration( mapViewDirectionsResults.duration);
           }}
         />
-        <Marker coordinate={locationState.deliveryLocation}>
+        <Marker coordinate={locationState.deliveryLocation}
+          title='Delivery más cercano'
+          description={'Latidud:'+ locationState.deliveryLocation.latitude +'Longitud:'+ locationState.deliveryLocation.longitude}
+          >
           <Image
             source={require('../../assets/images/icons/cilindro_amarillo.png')}
             style={{width: 50.0, height: 50.0, resizeMode: 'stretch'}}
           />
         </Marker>
-        <Marker coordinate={locationState.location}>
+        <Marker coordinate={locationState.location}
+          title='Punto de entrega'
+          description='Se entregara en esta dirección'
+          >
           <Image
             source={require('../../assets/images/icons/marker3.png')}
             style={{width: 23.0, height: 23.0}}
