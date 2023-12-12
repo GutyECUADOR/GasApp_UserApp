@@ -6,22 +6,24 @@ import {
   TouchableOpacity,
   ActivityIndicator
 } from 'react-native';
-import React from 'react';
+import React, { useContext } from 'react';
 import {Colors, Fonts, Sizes, screenWidth} from '../../constants/styles';
 import MapViewDirections from 'react-native-maps-directions';
 import {Key} from '../../constants/key';
 import MapView, {PROVIDER_GOOGLE, Marker, Callout} from 'react-native-maps';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import * as Animatable from 'react-native-animatable';
-import * as Progress from 'react-native-progress';
 import MyStatusBar from '../../components/myStatusBar';
+import { LocationContext } from '../../context/LocationContext';
 
 const SearchingForDriversScreen = ({navigation}) => {
+  const { locationState, setDistance, setDuration } = useContext(LocationContext);
+
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
       <MyStatusBar />
       <View style={{flex: 1}}>
-        {directionInfo()}
+        {displayMap()}
         {header()}
       </View>
       {searchingDriverSheet()}
@@ -67,7 +69,7 @@ const SearchingForDriversScreen = ({navigation}) => {
           }}
           style={{...styles.buttonStyle, marginLeft: Sizes.fixPadding - 8.5}}>
           <Text numberOfLines={1} style={{...Fonts.whiteColor18Bold}}>
-            Continue
+            Continuar
           </Text>
         </TouchableOpacity>
       </View>
@@ -126,64 +128,46 @@ const SearchingForDriversScreen = ({navigation}) => {
     );
   }
 
-  function directionInfo() {
-    const currentCabLocation = {
-      latitude: 22.715024,
-      longitude: 88.474119,
-    };
-    const userLocation = {
-      latitude: 22.558488,
-      longitude: 88.309215,
-    };
+  function displayMap() {
     return (
       <MapView
         region={{
-          latitude: 22.424259,
-          longitude: 88.379139,
-          latitudeDelta: 0.5,
-          longitudeDelta: 0.5,
+          latitude: locationState.location.latitude,
+          longitude: locationState.location.longitude,
+          latitudeDelta: 0.15,
+          longitudeDelta: 0.15,
         }}
         style={{height: '100%'}}
-        provider={PROVIDER_GOOGLE}
-        mapType="terrain">
+        provider={PROVIDER_GOOGLE}>
         <MapViewDirections
-          origin={userLocation}
-          destination={currentCabLocation}
+          origin={locationState.deliveryLocation}
+          destination={locationState.location}
           apikey={Key.apiKey}
           strokeColor={Colors.primaryColor}
           strokeWidth={3}
+
+          onReady={ mapViewDirectionsResults =>{
+            setDistance( mapViewDirectionsResults.distance);
+            setDuration( mapViewDirectionsResults.duration);
+          }}
         />
-        <Marker coordinate={currentCabLocation}>
+        <Marker coordinate={locationState.deliveryLocation}
+          title='Delivery más cercano'
+          description={'Latidud:'+ locationState.deliveryLocation.latitude +'Longitud:'+ locationState.deliveryLocation.longitude}
+          >
           <Image
-            source={require('../../assets/images/icons/marker2.png')}
+            source={require('../../assets/images/icons/cilindro_amarillo.png')}
             style={{width: 50.0, height: 50.0, resizeMode: 'stretch'}}
           />
-          <Callout>
-            <View style={styles.calloutWrapStyle}>
-              <View style={styles.kilometerInfoWrapStyle}>
-                <Text style={{...Fonts.whiteColor10Bold}}>10km</Text>
-              </View>
-              <Text
-                style={{
-                  marginLeft: Sizes.fixPadding,
-                  flex: 1,
-                  ...Fonts.blackColor14SemiBold,
-                }}>
-                1655 Island Pkwy, Kamloops, BC V2B 6Y9
-              </Text>
-            </View>
-          </Callout>
         </Marker>
-        <Marker coordinate={userLocation}>
+        <Marker coordinate={locationState.location}
+          title='Punto de entrega'
+          description='Se entregara en esta dirección'
+          >
           <Image
             source={require('../../assets/images/icons/marker3.png')}
             style={{width: 23.0, height: 23.0}}
           />
-          <Callout>
-            <Text style={{width: screenWidth / 1.5, ...Fonts.blackColor14SemiBold}}>
-              9 Bailey Drive, Fredericton, NB E3B 5A3
-            </Text>
-          </Callout>
         </Marker>
       </MapView>
     );

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Colors,
   Fonts,
@@ -23,13 +23,15 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import * as Animatable from 'react-native-animatable';
 import MyStatusBar from '../../components/myStatusBar';
+import { LocationContext } from '../../context/LocationContext';
 
 const RideStartedScreen = ({navigation}) => {
+  const { locationState, setDistance, setDuration } = useContext(LocationContext);
   return (
     <View style={{flex: 1, backgroundColor: Colors.shadowColor}}>
       <MyStatusBar />
       <View style={{flex: 1}}>
-        {directionInfo()}
+        {displayMap()}
        {/*  {reachingDestinationInfo()} */}
         {header()}
         {driverInfoSheet()}
@@ -166,49 +168,45 @@ const RideStartedScreen = ({navigation}) => {
     );
   }
 
-  function directionInfo() {
-    const currentCabLocation = {
-      latitude: 22.715024,
-      longitude: 88.474119,
-    };
-    const userLocation = {
-      latitude: 22.558488,
-      longitude: 88.309215,
-    };
+  function displayMap() {
     return (
       <MapView
         region={{
-          latitude: 22.528682,
-          longitude: 88.374505,
-          latitudeDelta: 0.5,
-          longitudeDelta: 0.5,
+          latitude: locationState.location.latitude,
+          longitude: locationState.location.longitude,
+          latitudeDelta: 0.15,
+          longitudeDelta: 0.15,
         }}
         style={{height: '100%'}}
-        provider={PROVIDER_GOOGLE}
-        mapType="terrain">
+        provider={PROVIDER_GOOGLE}>
         <MapViewDirections
-          origin={userLocation}
-          destination={currentCabLocation}
+          origin={locationState.deliveryLocation}
+          destination={locationState.location}
           apikey={Key.apiKey}
           strokeColor={Colors.primaryColor}
           strokeWidth={3}
+
+          onReady={ mapViewDirectionsResults =>{
+            setDistance( mapViewDirectionsResults.distance);
+            setDuration( mapViewDirectionsResults.duration);
+          }}
         />
-        <Marker coordinate={currentCabLocation}>
+        <Marker coordinate={locationState.deliveryLocation}
+          title='Delivery más cercano'
+          description={'Latidud:'+ locationState.deliveryLocation.latitude +'Longitud:'+ locationState.deliveryLocation.longitude}
+          >
           <Image
-            source={require('../../assets/images/icons/marker2.png')}
+            source={require('../../assets/images/icons/cilindro_amarillo.png')}
             style={{width: 50.0, height: 50.0, resizeMode: 'stretch'}}
           />
         </Marker>
-        <Marker coordinate={userLocation}>
+        <Marker coordinate={locationState.location}
+          title='Punto de entrega'
+          description='Se entregara en esta dirección'
+          >
           <Image
-            source={require('../../assets/images/icons/cab.png')}
-            style={{
-              width: 25.0,
-              height: 45.0,
-              resizeMode: 'contain',
-              top: 16.0,
-              transform: [{rotate: '70deg'}],
-            }}
+            source={require('../../assets/images/icons/marker3.png')}
+            style={{width: 23.0, height: 23.0}}
           />
         </Marker>
       </MapView>
