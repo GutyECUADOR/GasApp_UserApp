@@ -8,7 +8,7 @@ import {
   ScrollView,
   ImageBackground
 } from 'react-native';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {Colors, Fonts, Sizes, screenHeight, screenWidth} from '../../constants/styles';
 import MapViewDirections from 'react-native-maps-directions';
 import {Key} from '../../constants/key';
@@ -21,8 +21,9 @@ import firestore from '@react-native-firebase/firestore';
 
 const SearchingForDriversScreen = ({navigation}) => {
   const { locationState, setDistance, setDuration } = useContext(LocationContext);
+  const [delivery, setDelivery] = useState(null)
 
-  const calncelPedidoDelivery = async () => {
+  const cancelPedidoDelivery = async () => {
     await firestore()
       .collection('pedidos')
       .doc(locationState.pedidoActivoID)
@@ -32,6 +33,25 @@ const SearchingForDriversScreen = ({navigation}) => {
       });
   }
 
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('pedidos')
+      .doc(locationState.pedidoActivoID)
+      .onSnapshot(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          const delivery = documentSnapshot.get('delivery');
+          console.log('User data: ', documentSnapshot.data());
+          console.log('Delivery del pedido: ', delivery);
+          setDelivery(delivery);
+        }else{
+          setDelivery(null);
+        }
+      });
+  
+    return () => subscriber();
+  }, [locationState.pedidoActivoID])
+  
+
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
       <MyStatusBar />
@@ -39,7 +59,7 @@ const SearchingForDriversScreen = ({navigation}) => {
         {displayMap()}
         {header()}
       </View>
-      {searchingDriverSheet()}
+      { delivery == null ? searchingDriverSheet() : driverInfoSheet() }
     </View>
   );
 
@@ -163,7 +183,7 @@ const SearchingForDriversScreen = ({navigation}) => {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={ async () => {
-            await calncelPedidoDelivery();
+            await cancelPedidoDelivery();
             navigation.pop();
           }}
           style={{...styles.buttonStyle, marginRight: Sizes.fixPadding - 8.5}}>

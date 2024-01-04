@@ -55,8 +55,7 @@ const SelectPaymentMethodScreen = ({navigation}) => {
         email: user.email,
         address: locationState.address,
         coordinate: new firestore.GeoPoint(locationState.location.latitude, locationState.location.longitude),
-      },
-      status: 'Pendiente'
+      }
     })
 
     setHasPedidoActivo(true);
