@@ -5,7 +5,8 @@ export interface LocationState {
     address: string;
     location: Location;
     deliveryLocation: Location;
-    isPedidoActivo: boolean;
+    hasPedidoActivo: boolean;
+    pedidoActivoID: string;
     duration: number;
     distance: number;
     amount: number;
@@ -20,6 +21,7 @@ type LocationAction = |
     | { type: 'setDeliverylocation', payload: { location: Location } }
     | { type: 'sethasLocation', payload: boolean }
     | { type: 'setHasPedidoActivo', payload: boolean }
+    | { type: 'setPedidoActivoID', payload: string }
     | { type: 'setAmount', payload: number }
     | { type: 'setDistance', payload: number }
     | { type: 'setDuration', payload: number }
@@ -59,7 +61,14 @@ export const LocationReducer = ( state: LocationState, action: LocationAction) :
         case 'setHasPedidoActivo':
             return {
                 ...state,
-                isPedidoActivo: action.payload
+                hasPedidoActivo: action.payload
+            }
+            break;
+
+        case 'setPedidoActivoID':
+            return {
+                ...state,
+                pedidoActivoID: action.payload
             }
             break;
 

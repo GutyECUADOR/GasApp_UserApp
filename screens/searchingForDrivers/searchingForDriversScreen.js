@@ -17,9 +17,20 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import * as Animatable from 'react-native-animatable';
 import MyStatusBar from '../../components/myStatusBar';
 import { LocationContext } from '../../context/LocationContext';
+import firestore from '@react-native-firebase/firestore';
 
 const SearchingForDriversScreen = ({navigation}) => {
   const { locationState, setDistance, setDuration } = useContext(LocationContext);
+
+  const calncelPedidoDelivery = async () => {
+    await firestore()
+      .collection('pedidos')
+      .doc(locationState.pedidoActivoID)
+      .delete()
+      .then(() => {
+        console.log(`Pedido ${locationState.pedidoActivoID} cancelado`);
+      });
+  }
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
@@ -151,7 +162,8 @@ const SearchingForDriversScreen = ({navigation}) => {
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => {
+          onPress={ async () => {
+            await calncelPedidoDelivery();
             navigation.pop();
           }}
           style={{...styles.buttonStyle, marginRight: Sizes.fixPadding - 8.5}}>

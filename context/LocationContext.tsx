@@ -23,7 +23,8 @@ export const locationInitialState: LocationState = {
     address: 'Mi Ubicación Actual',
     location: new LocationClass(0, 0),
     deliveryLocation: new LocationClass(-0.203525, -78.483344),
-    isPedidoActivo: false,
+    hasPedidoActivo: false,
+    pedidoActivoID: '',
     amount: 0,
     distance: 0,
     duration: 0
@@ -39,6 +40,7 @@ export interface LocationContextProps {
     setDeliveryLocation: (location: Location) => void;
     setHasLocation: (hasLocation: boolean) => void;
     setHasPedidoActivo: (hasLocation: boolean) => void;
+    setPedidoActivoID: (firestoreID: string) => void;
     setAmount: (amount: number) => void;
     setDistance: (distance: number) => void;
     setDuration: (duration: number) => void;
@@ -91,8 +93,12 @@ export const LocationProvider = ({ children }: any) => {
         dispatch({type: 'sethasLocation', payload: hasLocation})
     }
 
-    const setHasPedidoActivo = (hasLocation: boolean) => {
-        dispatch({type: 'setHasPedidoActivo', payload: hasLocation})
+    const setHasPedidoActivo = (hasPedidoActivo: boolean) => {
+        dispatch({type: 'setHasPedidoActivo', payload: hasPedidoActivo})
+    }
+
+    const setPedidoActivoID = (firestoreID: string) => {
+        dispatch({type: 'setPedidoActivoID', payload: firestoreID})
     }
 
     const setAmount = (amount: number) => {
@@ -125,6 +131,7 @@ export const LocationProvider = ({ children }: any) => {
             setDeliveryLocation,
             setHasLocation,
             setHasPedidoActivo,
+            setPedidoActivoID,
             getCurrentLocation,
             getAddress,
             setAmount,

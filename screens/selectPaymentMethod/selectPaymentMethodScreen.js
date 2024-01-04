@@ -23,7 +23,8 @@ import BottomSheet from 'react-native-simple-bottom-sheet';
 import * as Animatable from 'react-native-animatable';
 import MyStatusBar from '../../components/myStatusBar';
 import { LocationContext } from '../../context/LocationContext';
-
+import firestore from '@react-native-firebase/firestore';
+import { AuthContext } from '../../context/AuthContext';
 
 const paymentmethods = [
   {
@@ -43,7 +44,25 @@ const paymentmethods = [
 const SelectPaymentMethodScreen = ({navigation}) => {
   const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] = useState(0);
   
-  const { locationState, setDistance, setDuration } = useContext(LocationContext);
+  const { user } = useContext(AuthContext)
+  const { locationState, setDistance, setDuration, setHasPedidoActivo, setPedidoActivoID } = useContext(LocationContext);
+
+  const createPedidoDelivery = async () => {
+     const nuevoPedido = await firestore().collection('pedidos').add({
+      delivery: null,
+      client: {
+        name: user.name,
+        email: user.email,
+        address: locationState.address,
+        coordinate: new firestore.GeoPoint(locationState.location.latitude, locationState.location.longitude),
+      },
+      status: 'Pendiente'
+    })
+
+    setHasPedidoActivo(true);
+    setPedidoActivoID(nuevoPedido.id)
+    console.log('ID nuevo Pedido', nuevoPedido.id);
+  }
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
@@ -94,7 +113,8 @@ const SelectPaymentMethodScreen = ({navigation}) => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => {
+        onPress={ async () => {
+          await createPedidoDelivery();
           navigation.push('SearchingForDrivers');
         }}
         style={{
