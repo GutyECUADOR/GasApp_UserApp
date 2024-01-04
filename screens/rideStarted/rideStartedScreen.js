@@ -49,7 +49,14 @@ const RideStartedScreen = ({navigation}) => {
         <ScrollView showsVerticalScrollIndicator={false}>
           {driverInfo()}
         </ScrollView>
-        {endRideButton()}
+        <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => {
+          navigation.push('Rating');
+        }}
+        style={styles.buttonStyle}>
+        <Text style={{...Fonts.whiteColor18Bold}}>Finalizar</Text>
+      </TouchableOpacity>
       </Animatable.View>
     );
   }
@@ -76,6 +83,26 @@ const RideStartedScreen = ({navigation}) => {
       <View style={{marginTop: Sizes.fixPadding}}>
         {driverImageWithCallAndMessage()}
         {driverDetail()}
+      </View>
+    );
+  }
+
+  function driverImageWithCallAndMessage() {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View style={{alignItems: 'center', justifyContent: 'center'}}>
+          <ImageBackground
+            source={require('../../assets/images/users/nouser.png')}
+            style={styles.driverImageStyle}>
+            
+          </ImageBackground>
+        </View>
+        
       </View>
     );
   }
@@ -123,25 +150,7 @@ const RideStartedScreen = ({navigation}) => {
     );
   }
 
-  function driverImageWithCallAndMessage() {
-    return (
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <View style={{alignItems: 'center', justifyContent: 'center'}}>
-          <ImageBackground
-            source={require('../../assets/images/users/nouser.png')}
-            style={styles.driverImageStyle}>
-            
-          </ImageBackground>
-        </View>
-        
-      </View>
-    );
-  }
+  
 
   function reachingDestinationInfo() {
     return (

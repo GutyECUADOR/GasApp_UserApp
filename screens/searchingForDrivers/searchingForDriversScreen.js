@@ -4,10 +4,12 @@ import {
   View,
   Image,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  ScrollView,
+  ImageBackground
 } from 'react-native';
 import React, { useContext } from 'react';
-import {Colors, Fonts, Sizes, screenWidth} from '../../constants/styles';
+import {Colors, Fonts, Sizes, screenHeight, screenWidth} from '../../constants/styles';
 import MapViewDirections from 'react-native-maps-directions';
 import {Key} from '../../constants/key';
 import MapView, {PROVIDER_GOOGLE, Marker, Callout} from 'react-native-maps';
@@ -45,6 +47,101 @@ const SearchingForDriversScreen = ({navigation}) => {
     );
   }
 
+  function driverInfoSheet() {
+    return (
+      <Animatable.View
+        animation="slideInUp"
+        iterationCount={1}
+        duration={1500}
+        style={{...styles.bottomSheetWrapStyle}}>
+        {driverInfo()}
+       
+        <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => {
+          navigation.push('Rating');
+        }}
+        style={styles.buttonStyle}>
+        <Text style={{...Fonts.whiteColor18Bold}}>Finalizar</Text>
+      </TouchableOpacity>
+      </Animatable.View>
+    );
+  }
+
+  function driverInfo() {
+    return (
+      <View style={{marginTop: Sizes.fixPadding}}>
+        {driverImageWithCallAndMessage()}
+        {driverDetail()}
+      </View>
+    );
+  }
+
+  function driverImageWithCallAndMessage() {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View style={{alignItems: 'center', justifyContent: 'center'}}>
+          <ImageBackground
+            source={require('../../assets/images/users/nouser.png')}
+            style={styles.driverImageStyle}>
+            
+          </ImageBackground>
+        </View>
+        
+      </View>
+    );
+  }
+
+  function driverDetail() {
+    return (
+      <View
+        style={{
+          marginTop: Sizes.fixPadding,
+          marginBottom: Sizes.fixPadding * 3.0,
+        }}>
+        <Text style={{textAlign: 'center', ...Fonts.blackColor17SemiBold}}>
+          Cameron Williamson
+        </Text>
+        <View style={styles.rideInfoWrapStyle}>
+          <View
+            style={{
+              maxWidth: screenWidth / 2.5,
+              marginHorizontal: Sizes.fixPadding + 9.0,
+              alignItems: 'center',
+            }}>
+            <Text numberOfLines={1} style={{...Fonts.grayColor14Regular}}>
+              Teléfono
+            </Text>
+            <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
+              0999887477
+            </Text>
+          </View>
+          <View
+            style={{
+              maxWidth: screenWidth / 2.5,
+              marginHorizontal: Sizes.fixPadding + 9.0,
+              alignItems: 'center',
+            }}>
+            <Text numberOfLines={1} style={{...Fonts.grayColor14Regular}}>
+              LLegará en
+            </Text>
+            <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
+              15 mins
+            </Text>
+          </View>
+          
+        </View>
+      </View>
+    );
+  }
+
+  
+
   function indicator() {
     return <View style={{...styles.sheetIndicatorStyle}} />;
   }
@@ -62,16 +159,7 @@ const SearchingForDriversScreen = ({navigation}) => {
             Cancelar
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => {
-            navigation.push('RideStarted');
-          }}
-          style={{...styles.buttonStyle, marginLeft: Sizes.fixPadding - 8.5}}>
-          <Text numberOfLines={1} style={{...Fonts.whiteColor18Bold}}>
-            Continuar
-          </Text>
-        </TouchableOpacity>
+        
       </View>
     );
   }
@@ -113,6 +201,8 @@ const SearchingForDriversScreen = ({navigation}) => {
       </View>
     );
   }
+
+  
 
   function header() {
     return (
@@ -206,6 +296,16 @@ const styles = StyleSheet.create({
     left: 0.0,
     right: 0.0,
   },
+  bottomSheetWrapStyleDriver: {
+    borderTopLeftRadius: Sizes.fixPadding * 2.5,
+    borderTopRightRadius: Sizes.fixPadding * 2.5,
+    backgroundColor: Colors.whiteColor,
+    position: 'absolute',
+    left: 0.0,
+    right: 0.0,
+    bottom: 0.0,
+    maxHeight: screenHeight / 2.4,
+  },
   sheetIndicatorStyle: {
     width: 50,
     height: 5.0,
@@ -222,5 +322,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: Sizes.fixPadding + 2.0,
     borderColor: Colors.whiteColor,
+  },
+  rideInfoWrapStyle: {
+    marginTop: Sizes.fixPadding,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  driverImageStyle: {
+    width: screenWidth / 4.0,
+    height: screenWidth / 4.0,
+    backgroundColor: 'orange',
+    borderRadius: screenWidth / 4.0 / 2.0,
+    marginHorizontal: Sizes.fixPadding * 2.0,
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
   },
 });

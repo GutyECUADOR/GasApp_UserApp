@@ -290,7 +290,7 @@ const HomeScreen = ({navigation}) => {
         <MapView
           ref={ (element) => mapViewRef.current = element}
           zoomEnabled={true}
-          minZoomLevel={15}
+          minZoomLevel={13}
           zoomControlEnabled={true}
           showsUserLocation={true}
           region={{
