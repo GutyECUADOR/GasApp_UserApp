@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
-  ImageBackground
+  ImageBackground,
+  BackHandler
 } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import {Colors, Fonts, Sizes, screenHeight, screenWidth} from '../../constants/styles';
@@ -20,9 +21,8 @@ import { LocationContext } from '../../context/LocationContext';
 import firestore from '@react-native-firebase/firestore';
 
 const SearchingForDriversScreen = ({navigation}) => {
-  const { locationState, setDistance, setDuration } = useContext(LocationContext);
-  const [delivery, setDelivery] = useState(null)
-
+  const { locationState, setDistance, setDuration, setDelivery } = useContext(LocationContext);
+  
   const cancelPedidoDelivery = async () => {
     await firestore()
       .collection('pedidos')
@@ -42,7 +42,19 @@ const SearchingForDriversScreen = ({navigation}) => {
           const delivery = documentSnapshot.get('delivery');
           console.log('User data: ', documentSnapshot.data());
           console.log('Delivery del pedido: ', delivery);
-          setDelivery(delivery);
+          if (delivery) {
+            setDelivery({
+              coordinate: {
+                latitude: delivery.coordinate.latitude,
+                longitude: delivery.coordinate.longitude
+              },
+              name: delivery.name,
+              email: delivery.email,
+              phone: delivery.phone
+            });
+          }else{
+            setDelivery(null);
+          }
         }else{
           setDelivery(null);
         }
@@ -51,15 +63,20 @@ const SearchingForDriversScreen = ({navigation}) => {
     return () => subscriber();
   }, [locationState.pedidoActivoID])
   
+  // Disable back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true)
+    return () => backHandler.remove()
+  }, [])
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
       <MyStatusBar />
       <View style={{flex: 1}}>
         {displayMap()}
-        {header()}
       </View>
-      { delivery == null ? searchingDriverSheet() : driverInfoSheet() }
+      { console.log(locationState.delivery) }
+      { locationState.delivery == null ? searchingDriverSheet() : driverInfoSheet() }
     </View>
   );
 
@@ -136,7 +153,7 @@ const SearchingForDriversScreen = ({navigation}) => {
           marginBottom: Sizes.fixPadding * 3.0,
         }}>
         <Text style={{textAlign: 'center', ...Fonts.blackColor17SemiBold}}>
-          Cameron Williamson
+          { locationState.delivery.name }
         </Text>
         <View style={styles.rideInfoWrapStyle}>
           <View
@@ -146,10 +163,13 @@ const SearchingForDriversScreen = ({navigation}) => {
               alignItems: 'center',
             }}>
             <Text numberOfLines={1} style={{...Fonts.grayColor14Regular}}>
-              Teléfono
+              Contácto
             </Text>
             <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
-              0999887477
+              { locationState.delivery.email }
+            </Text>
+            <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
+              { locationState.delivery.phone }
             </Text>
           </View>
           <View
@@ -159,10 +179,13 @@ const SearchingForDriversScreen = ({navigation}) => {
               alignItems: 'center',
             }}>
             <Text numberOfLines={1} style={{...Fonts.grayColor14Regular}}>
-              LLegará en
+              Tiempo Estimado
             </Text>
             <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
-              15 mins
+              { locationState.distance.toFixed(2) } Km 
+            </Text>
+            <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
+              { locationState.duration.toFixed(2) } min
             </Text>
           </View>
           

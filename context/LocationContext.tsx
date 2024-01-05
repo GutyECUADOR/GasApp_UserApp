@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useEffect} from 'react';
-import { Location } from '../interfaces/Location';
+import { Delivery, Location } from '../interfaces/Location';
 import { LocationReducer, LocationState } from './LocationReducer';
 import Geolocation from '@react-native-community/geolocation';
 import Geocoder from 'react-native-geocoding';
@@ -13,8 +13,6 @@ export class LocationClass implements Location {
         this.latitude = latitude;
         this.longitude = longitude;
     }
-   
-
 }
 
 /* Estado Inicial */
@@ -22,7 +20,8 @@ export const locationInitialState: LocationState = {
     hasLocation: false,
     address: 'Mi Ubicación Actual',
     location: new LocationClass(0, 0),
-    deliveryLocation: new LocationClass(-0.203525, -78.483344),
+    deliveryLocation: new LocationClass(0, 0), // Utilizada para el delivery más cercano
+    delivery: null,  // Utilizado para registrar valor del delivery que acepto el pedido
     hasPedidoActivo: false,
     pedidoActivoID: '',
     amount: 0,
@@ -38,6 +37,7 @@ export interface LocationContextProps {
     getAddress: () => Promise<void>;
     setLocation: (location: Location) => void;
     setDeliveryLocation: (location: Location) => void;
+    setDelivery: (delivery: Delivery | null) => void;
     setHasLocation: (hasLocation: boolean) => void;
     setHasPedidoActivo: (hasLocation: boolean) => void;
     setPedidoActivoID: (firestoreID: string) => void;
@@ -89,6 +89,10 @@ export const LocationProvider = ({ children }: any) => {
         dispatch({type: 'setDeliverylocation', payload: {location}})
     }
 
+    const setDelivery = (delivery: Delivery | null) => {
+        dispatch({type: 'setDelivery', payload: {delivery}})
+    }
+
     const setHasLocation = (hasLocation: boolean) => {
         dispatch({type: 'sethasLocation', payload: hasLocation})
     }
@@ -129,6 +133,7 @@ export const LocationProvider = ({ children }: any) => {
             locationState,
             setLocation,
             setDeliveryLocation,
+            setDelivery,
             setHasLocation,
             setHasPedidoActivo,
             setPedidoActivoID,

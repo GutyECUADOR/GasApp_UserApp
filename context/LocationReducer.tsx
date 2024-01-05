@@ -1,16 +1,16 @@
-import { Location } from "../interfaces/Location";
+import { Location, Delivery } from "../interfaces/Location";
 
 export interface LocationState {
     hasLocation: boolean;
     address: string;
     location: Location;
     deliveryLocation: Location;
+    delivery: Delivery | null;
     hasPedidoActivo: boolean;
     pedidoActivoID: string;
     duration: number;
     distance: number;
     amount: number;
-
 }
 
 
@@ -19,6 +19,7 @@ type LocationAction = |
     { type: 'setLocation', payload: { location: Location }}
     | { type: 'setAddress', payload: string }
     | { type: 'setDeliverylocation', payload: { location: Location } }
+    | { type: 'setDelivery', payload: { delivery: Delivery | null } }
     | { type: 'sethasLocation', payload: boolean }
     | { type: 'setHasPedidoActivo', payload: boolean }
     | { type: 'setPedidoActivoID', payload: string }
@@ -41,6 +42,13 @@ export const LocationReducer = ( state: LocationState, action: LocationAction) :
             return {
                 ...state,
                 deliveryLocation: action.payload.location
+            }
+            break;
+
+        case 'setDelivery':
+            return {
+                ...state,
+                delivery: action.payload.delivery
             }
             break;
 
