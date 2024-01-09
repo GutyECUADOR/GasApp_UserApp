@@ -23,13 +23,13 @@ import firestore from '@react-native-firebase/firestore';
 const SearchingForDriversScreen = ({navigation}) => {
   const { locationState, setDistance, setDuration, setDelivery } = useContext(LocationContext);
   
-  const cancelPedidoDelivery = async () => {
+  const finalizarPedidoDelivery = async () => {
     await firestore()
       .collection('pedidos')
       .doc(locationState.pedidoActivoID)
       .delete()
       .then(() => {
-        console.log(`Pedido ${locationState.pedidoActivoID} cancelado`);
+        console.log(`Pedido ${locationState.pedidoActivoID} cancelado/finalizado`);
       });
   }
 
@@ -106,11 +106,12 @@ const SearchingForDriversScreen = ({navigation}) => {
        
         <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => {
+        onPress={ async () => {
+          await finalizarPedidoDelivery();
           navigation.push('Rating');
         }}
         style={styles.buttonStyle}>
-        <Text style={{...Fonts.whiteColor18Bold}}>Finalizar</Text>
+        <Text style={{...Fonts.whiteColor18Bold}}>Finalizar Pedido</Text>
       </TouchableOpacity>
       </Animatable.View>
     );
@@ -206,8 +207,8 @@ const SearchingForDriversScreen = ({navigation}) => {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={ async () => {
-            await cancelPedidoDelivery();
-            navigation.pop();
+            await finalizarPedidoDelivery();
+            navigation.push('Home');
           }}
           style={{...styles.buttonStyle, marginRight: Sizes.fixPadding - 8.5}}>
           <Text numberOfLines={1} style={{...Fonts.whiteColor18Bold}}>

@@ -209,7 +209,7 @@ const RatingScreen = ({navigation}) => {
             textAlign: 'center',
             ...Fonts.blackColor17SemiBold,
           }}>
-          Cameron Williamson
+          Gracias por usar la app
         </Text>
       </View>
     );
