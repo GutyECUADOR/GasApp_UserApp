@@ -200,7 +200,7 @@ const CustomDrawer = props => {
             props.navigation.closeDrawer();
           },
         })}
-        {divider()}
+       {/*  {divider()}
         {drawerOptionSort({
           iconName: 'book',
           option: 'Mis pedidos',
@@ -209,7 +209,7 @@ const CustomDrawer = props => {
             props.navigation.push('UserRides');
           },
         })}
-        {divider()}
+        {divider()} */}
         {/* {drawerOptionSort({
           iconName: 'account-balance-wallet',
           option: 'Wallet',
