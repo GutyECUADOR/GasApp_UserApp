@@ -11,26 +11,58 @@ import {
   ActivityIndicator,
   Alert
 } from 'react-native';
+import {Key} from '../../constants/key';
 import React, {useState, useEffect, useCallback, useRef, useContext} from 'react';
 import {Colors, Fonts, Sizes, screenHeight} from '../../constants/styles';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
 import {Overlay} from '@rneui/themed';
 import BottomSheet from 'react-native-simple-bottom-sheet';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import * as Animatable from 'react-native-animatable';
 import {useFocusEffect} from '@react-navigation/native';
 import MyStatusBar from '../../components/myStatusBar';
 import { getDistance } from 'geolib';
 
-//import database from '@react-native-firebase/database';
 import firestore from '@react-native-firebase/firestore';
+import { AuthContext } from '../../context/AuthContext';
 import { LocationClass, LocationContext } from '../../context/LocationContext';
 
 const HomeScreen = ({navigation}) => {
 
+  // Constantes
+  const paymentmethods = [
+    {
+      id: '1',
+      paymentIcon: require('../../assets/images/paymentMethods/cash.png'),
+      paymentType: 'cash',
+      paymentMethod: 'Efectivo',
+    },
+    {
+      id: '2',
+      paymentIcon: require('../../assets/images/paymentMethods/wallet.png'),
+      paymentType: 'other',
+      paymentMethod: 'Transferencia Bancaria',
+    },
+  ];
+
+  const appState = {
+    SinPedido: 'SinPedido',
+    SeleccionandoPago: 'SeleccionandoPago',
+    BuscandoDelivery: 'BuscandoDelivery',
+    DeliveryIniciado: 'DeliveryIniciado',
+    DeliveryFinalizado: 'DeliveryFinalizado'
+  };
+
+  // State
+  const [pedidoStep, setpedidoStep] = useState(appState.SinPedido)
   const [backClickCount, setBackClickCount] = useState(0);
   const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([])
+  const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] = useState(0);
 
-  const { locationState, setLocation, setDeliveryLocation, getAddress, getCurrentLocation } = useContext(LocationContext);
+  // Contexts
+  const { user } = useContext(AuthContext)
+  const { locationState, setLocation, setDistance, setDuration, setDeliveryLocation, getAddress, getCurrentLocation, setHasPedidoActivo, setPedidoActivoID } = useContext(LocationContext);
 
   const mapViewRef = useRef();
 
@@ -38,6 +70,7 @@ const HomeScreen = ({navigation}) => {
     return array.sort((a, b) => a.distance - b.distance);
   }
 
+  // Watch de distribuidores activos en firestore
   useEffect(() => {
     const subscriber = firestore()
     .collection('distribuidores').where('isActivo', '==', true).limit(10)
@@ -70,11 +103,29 @@ const HomeScreen = ({navigation}) => {
     return () => subscriber();
   }, [locationState.location]);
 
+  // Obtener dirección de las coordenadas
   useEffect(() => {
     getAddress();
   }, [])
-  
 
+  // Crear pedido en Firestore
+  const createPedidoDelivery = async () => {
+    const nuevoPedido = await firestore().collection('pedidos').add({
+     delivery: null,
+     status: 'Pendiente',
+     client: {
+       name: user.name,
+       email: user.email,
+       address: locationState.address,
+       coordinate: new firestore.GeoPoint(locationState.location.latitude, locationState.location.longitude),
+     }
+   })
+
+   setHasPedidoActivo(true);
+   setPedidoActivoID(nuevoPedido.id)
+   console.log('ID nuevo Pedido', nuevoPedido.id);
+ }
+  
   const centerPosition = async () => {
     const { latitude, longitude } = await getCurrentLocation()
     setLocation({latitude, longitude});
@@ -86,8 +137,6 @@ const HomeScreen = ({navigation}) => {
       }
     })
   };
-
- 
 
   const backAction = () => {
     if (Platform.OS === 'ios') {
@@ -141,7 +190,7 @@ const HomeScreen = ({navigation}) => {
     );
   }
 
-  function continueButton() {
+  function solicitarButton() {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
@@ -160,40 +209,217 @@ const HomeScreen = ({navigation}) => {
           const closestLocation = {latitude, longitude};
           console.log(deliveryLocationByDistance)
           await setDeliveryLocation(closestLocation);
-          navigation.push('SelectPaymentMethod');
+          setpedidoStep(appState.SeleccionandoPago);
+          /* navigation.push('SelectPaymentMethod'); */
         }}
         style={styles.buttonStyle}>
         <Text style={{...Fonts.whiteColor18Bold}}>Solicitar</Text>
       </TouchableOpacity>
     );
   }
-  
+
+  function confirmPaymentMethodButton() {
+    return (
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={ async () => {
+          await createPedidoDelivery();
+          setpedidoStep(appState.BuscandoDelivery);
+        }}
+        style={{
+          ...styles.buttonStyle,
+          position: 'absolute',
+          bottom: 0.0,
+          right: 0.0,
+          left: 0.0,
+        }}>
+        <Text style={{...Fonts.whiteColor18Bold}}>Confirmar pago</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  /* PaymentSheet */
+
+  function paymentSheet() {
+    return (
+      <BottomSheet
+        isOpen={false}
+        sliderMinHeight={300}
+        sliderMaxHeight={screenHeight - 150.0}
+        lineContainerStyle={{
+          height: 0.0,
+          marginVertical: Sizes.fixPadding + 5.0,
+        }}
+        lineStyle={styles.sheetIndicatorStyle}
+        wrapperStyle={{...styles.bottomSheetWrapStyle}}>
+        {onScrollEndDrag => (
+          <ScrollView
+            onScrollEndDrag={onScrollEndDrag}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{paddingBottom: Sizes.fixPadding * 2.0}}>
+            <Animatable.View
+              animation="slideInUp"
+              iterationCount={1}
+              duration={1500}
+              style={{flex: 1}}>
+              {dropLocationInfo()}
+              {currentToDropLocDivider()}
+              {currentLocationInfo()}
+              {paymentMethodsInfo()}
+            </Animatable.View>
+          </ScrollView>
+        )}
+      </BottomSheet>
+    );
+  }
+
+  function dropLocationInfo() {
+    return (
+      <View style={styles.dropLocationInfoWrapStyle}>
+        <View style={{width: 24.0, alignItems: 'center'}}>
+          <MaterialIcons
+            name="location-pin"
+            size={24}
+            color={Colors.primaryColor}
+          />
+        </View>
+        <Text
+          numberOfLines={1}
+          style={{
+            flex: 1,
+            marginLeft: Sizes.fixPadding + 5.0,
+            ...Fonts.blackColor15SemiBold,
+          }}>
+          { locationState.address }
+        </Text>
+      </View>
+    );
+  }
+
+  function currentToDropLocDivider() {
+    return (
+      <View
+        style={{
+          marginHorizontal: Sizes.fixPadding * 2.0,
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        <View style={{width: 24.0, alignItems: 'center'}}>
+        </View>
+        <View style={styles.currentToDropLocationInfoDividerStyle} />
+      </View>
+    );
+  }
+
+  function currentLocationInfo() {
+    return (
+      <View style={styles.currentLocationInfoWrapStyle}>
+        <View style={{width: 24, alignItems: 'center'}}>
+          <View style={styles.currentLocationIconStyle}>
+            <View style={styles.currentLocationInnerCircel} />
+          </View>
+        </View>
+        <Text
+          numberOfLines={1}
+          style={{
+            marginLeft: Sizes.fixPadding + 5.0,
+            flex: 1,
+            ...Fonts.blackColor15SemiBold,
+          }}>
+            { locationState.distance.toFixed(2) } Km - 
+            { locationState.duration.toFixed(2) } min
+        </Text>
+      </View>
+    );
+  }
+
+  function paymentMethodsInfo() {
+    return (
+      <View
+        style={{
+          marginTop: Sizes.fixPadding * 2.0,
+          marginHorizontal: Sizes.fixPadding * 2.0,
+        }}>
+        <Text
+          style={{marginBottom: Sizes.fixPadding, ...Fonts.blackColor18Bold}}>
+          Método de pago
+        </Text>
+        {paymentmethods.map((item, index) => (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              setSelectedPaymentMethodIndex(index);
+            }}
+            key={`${item.id}`}
+            style={styles.paymentMethodWrapStyle}>
+            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+              <Image
+                source={item.paymentIcon}
+                style={{width: 40.0, height: 40.0, resizeMode: 'contain'}}
+              />
+              {item.paymentType == 'card' ? (
+                <View style={{marginLeft: Sizes.fixPadding + 5.0, flex: 1}}>
+                  <Text
+                    numberOfLines={1}
+                    style={{...Fonts.blackColor16SemiBold}}>
+                    {item.cardNumber}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={{...Fonts.grayColor12SemiBold}}>
+                    Expires 04/25
+                  </Text>
+                </View>
+              ) : (
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    marginLeft: Sizes.fixPadding + 5.0,
+                    flex: 1,
+                    ...Fonts.blackColor16SemiBold,
+                  }}>
+                  {item.paymentMethod}
+                </Text>
+              )}
+            </View>
+            <View
+              style={{
+                ...styles.selectedMethodIndicatorStyle,
+                backgroundColor:
+                  selectedPaymentMethodIndex == index
+                    ? Colors.lightBlackColor
+                    : Colors.shadowColor,
+              }}>
+              <MaterialIcons name="check" color={Colors.whiteColor} size={14} />
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  }
   
 
-
+  
   return (
     
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
       <MyStatusBar />
       <View style={{flex: 1}}>
         {displayMap()}
-        {currentLocationWithMenuIcon()}
-        {continueButton()}
+        {navBar()}
+        {pedidoStep == appState.SinPedido && solicitarButton()}
+        {pedidoStep == appState.SeleccionandoPago && paymentSheet()}
+        {pedidoStep == appState.SeleccionandoPago && confirmPaymentMethodButton()}
+        
       </View>
       {exitInfo()}
       {loadingDialog()}
     </View>
   );
 
-  function currentLocationIcon() {
-    return (
-      <View style={styles.currentLocationIconWrapStyle}>
-        <MaterialIcons onPress={centerPosition} name="my-location" size={30} color="black" />
-      </View>
-    );
-  }
+  
 
-  function currentLocationWithMenuIcon() {
+  function navBar() {
     return (
       <View style={styles.currentLocationWithIconWrapStyle}>
         <MaterialIcons
@@ -230,57 +456,11 @@ const HomeScreen = ({navigation}) => {
     );
   }
 
-  function nearestLocationsSheet() {
+  function currentLocationIcon() {
     return (
-      <BottomSheet
-        isOpen={true}
-        lineContainerStyle={{
-          height: 0.0,
-          marginVertical: Sizes.fixPadding + 5.0,
-        }}
-        lineStyle={styles.sheetIndicatorStyle}
-        wrapperStyle={{...styles.bottomSheetWrapStyle}}>
-        <Button
-          onPress={
-            () => {
-              navigation.push('SelectPaymentMethod');
-            }
-          }
-          title="Pedir Ahora"
-          color={Colors.primaryColor}
-          accessibilityLabel="Clic para solicitar"
-        />
-       
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingTop: Sizes.fixPadding,
-            paddingBottom: Sizes.fixPadding * 3.0,
-          }}>
-        </ScrollView>
-        {currentLocationIcon()}
-      </BottomSheet>
-    );
-  }
-
-  function searchBar() {
-    return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() => {
-          navigation.push('DropOffLocation');
-        }}
-        style={styles.searchBarWrapStyle}>
-        <MaterialIcons name="search" size={24} color={Colors.primaryColor} />
-        <Text
-          style={{
-            flex: 1,
-            marginLeft: Sizes.fixPadding,
-            ...Fonts.blackColor15SemiBold,
-          }}>
-          Where to go?
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.currentLocationIconWrapStyle}>
+        <MaterialIcons onPress={centerPosition} name="my-location" size={30} color="black" />
+      </View>
     );
   }
 
@@ -301,6 +481,18 @@ const HomeScreen = ({navigation}) => {
           }}
           style={{height: '100%'}}
           provider={PROVIDER_GOOGLE}>
+          <MapViewDirections
+            origin={locationState.deliveryLocation}
+            destination={locationState.location}
+            apikey={Key.apiKey}
+            strokeColor={Colors.primaryColor}
+            strokeWidth={3}
+
+            onReady={ mapViewDirectionsResults =>{
+              setDistance( mapViewDirectionsResults.distance);
+              setDuration( mapViewDirectionsResults.duration);
+            }}
+          />
           {distribuidoresCercanos.map((item, index) => (
             <Marker key={`${index}`} coordinate={ item.coordinate }
               title='Delivery Cercano'
@@ -376,12 +568,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bottomSheetWrapStyle: {
-    paddingBottom: Sizes.fixPadding - 5.0,
     paddingTop: Sizes.fixPadding + 5.0,
-    paddingHorizontal: Sizes.fixPadding * 2.0,
     borderTopLeftRadius: Sizes.fixPadding * 2.5,
     borderTopRightRadius: Sizes.fixPadding * 2.5,
     backgroundColor: Colors.whiteColor,
+    paddingHorizontal: 0.0,
+    elevation: 0.0,
+    marginBottom: Sizes.fixPadding * 4.5,
   },
   searchBarWrapStyle: {
     flexDirection: 'row',
@@ -434,5 +627,56 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: Sizes.fixPadding + 3.0,
-  }
+  },
+  dropLocationInfoWrapStyle: {
+    marginHorizontal: Sizes.fixPadding * 2.0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: -(Sizes.fixPadding - 10.0),
+  },
+  currentToDropLocationInfoDividerStyle: {
+    backgroundColor: Colors.shadowColor,
+    height: 1.0,
+    flex: 1,
+    marginRight: Sizes.fixPadding * 2.5,
+    marginLeft: Sizes.fixPadding,
+  },
+  currentLocationInfoWrapStyle: {
+    marginTop: Sizes.fixPadding,
+    marginHorizontal: Sizes.fixPadding * 2.0,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  currentLocationIconStyle: {
+    width: 18.0,
+    height: 18.0,
+    borderRadius: 9.0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: Colors.blackColor,
+    borderWidth: 2.0,
+  },
+  currentLocationInnerCircel: {
+    width: 7.0,
+    height: 7.0,
+    borderRadius: 3.5,
+    backgroundColor: Colors.blackColor,
+  },
+  paymentMethodWrapStyle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderColor: Colors.shadowColor,
+    borderWidth: 1.0,
+    borderRadius: Sizes.fixPadding - 5.0,
+    padding: Sizes.fixPadding,
+    marginBottom: Sizes.fixPadding + 5.0,
+  },
+  selectedMethodIndicatorStyle: {
+    width: 20.0,
+    height: 20.0,
+    borderRadius: 10.0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
