@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import {Key} from '../../constants/key';
 import React, {useState, useEffect, useCallback, useRef, useContext} from 'react';
-import {Colors, Fonts, Sizes, screenHeight} from '../../constants/styles';
+import {Colors, Fonts, Sizes, screenHeight, screenWidth} from '../../constants/styles';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import {Overlay} from '@rneui/themed';
@@ -68,6 +68,18 @@ const HomeScreen = ({navigation}) => {
 
   const sortByDistance = (array) => {
     return array.sort((a, b) => a.distance - b.distance);
+  }
+
+  const finalizarPedidoDelivery = async () => {
+    await firestore()
+      .collection('pedidos')
+      .doc(locationState.pedidoActivoID)
+      .delete()
+      .then(() => {
+        console.log(`Pedido ${locationState.pedidoActivoID} cancelado/finalizado`);
+      });
+
+      navigation.push('Rating');
   }
 
   // Watch de distribuidores activos en firestore
@@ -398,7 +410,104 @@ const HomeScreen = ({navigation}) => {
     );
   }
   
+  /* Searching for Drivers */
+  function searchingDriverSheet() {
+    return (
+      <Animatable.View
+        animation="slideInUp"
+        iterationCount={1}
+        duration={1500}
+        style={{...styles.bottomSheetWrapStyleSearching}}>
+        {indicatorSheet()}
+        {searchingInfo()}
+        {progressInfo()}
+        {cancelDeliveryButton()}
+      </Animatable.View>
+    );
+  }
 
+  function indicatorSheet() {
+    return <View style={{...styles.sheetIndicatorStyleSearching}} />;
+  }
+
+  function searchingInfo() {
+    return (
+      <View style={{alignItems: 'center', marginTop: Sizes.fixPadding + 5.0}}>
+        <Image
+          source={require('../../assets/images/search_driver.png')}
+          style={{width: '100%', height: screenWidth / 2.5, resizeMode: 'contain'}}
+        />
+        <Text
+          style={{
+            ...Fonts.blackColor16Regular,
+            textAlign: 'center',
+            margin: Sizes.fixPadding * 2.0,
+          }}>
+          Espera un momento!! Estamos contactando{`\n`} a un delivery cercano. Tiempo de espera máximo 15 min. Si ningun delivery ha aceptado tu solicitud despues de este tiempo intentalo más tarde.
+        </Text>
+      </View>
+    );
+  }
+
+  function progressInfo() {
+    return (
+      <View
+        style={{
+          marginHorizontal: Sizes.fixPadding * 5.0,
+          marginVertical: Sizes.fixPadding,
+        }}>
+        <ActivityIndicator
+          size={56}
+          color={Colors.primaryColor}
+          style={{
+            alignSelf: 'center',
+            transform: [{scale: Platform.OS == 'ios' ? 2 : 1}],
+          }}
+        />
+      </View>
+    );
+  }
+
+  function cancelDeliveryButton() {
+    return (
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={ async () => {
+            await finalizarPedidoDelivery();
+            setpedidoStep(appState.SinPedido);
+          }}
+          style={{...styles.buttonStyleSearching, marginRight: Sizes.fixPadding - 8.5}}>
+          <Text numberOfLines={1} style={{...Fonts.whiteColor18Bold}}>
+            Cancelar
+          </Text>
+        </TouchableOpacity>
+        
+      </View>
+    );
+  }
+
+  /* Delivery in progress */
+  function driverInfoSheet() {
+    return (
+      <Animatable.View
+        animation="slideInUp"
+        iterationCount={1}
+        duration={1500}
+        style={{...styles.bottomSheetWrapStyle}}>
+        {driverInfo()}
+       
+        <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={ async () => {
+          await finalizarPedidoDelivery();
+        }}
+        style={styles.buttonStyle}>
+        <Text style={{...Fonts.whiteColor18Bold}}>Finalizar Pedido</Text>
+      </TouchableOpacity>
+      </Animatable.View>
+    );
+  }
   
   return (
     
@@ -410,6 +519,8 @@ const HomeScreen = ({navigation}) => {
         {pedidoStep == appState.SinPedido && solicitarButton()}
         {pedidoStep == appState.SeleccionandoPago && paymentSheet()}
         {pedidoStep == appState.SeleccionandoPago && confirmPaymentMethodButton()}
+        {pedidoStep == appState.BuscandoDelivery && searchingDriverSheet() }
+        {pedidoStep == appState.DeliveryIniciado && driverInfoSheet() }
         
       </View>
       {exitInfo()}
@@ -679,4 +790,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Searching Delivery
+  bottomSheetWrapStyleSearching: {
+    borderTopLeftRadius: Sizes.fixPadding * 2.5,
+    borderTopRightRadius: Sizes.fixPadding * 2.5,
+    backgroundColor: Colors.whiteColor,
+    paddingHorizontal: 0.0,
+    position: 'absolute',
+    bottom: 0.0,
+    left: 0.0,
+    right: 0.0,
+  },
+  bottomSheetWrapStyleDriver: {
+    borderTopLeftRadius: Sizes.fixPadding * 2.5,
+    borderTopRightRadius: Sizes.fixPadding * 2.5,
+    backgroundColor: Colors.whiteColor,
+    position: 'absolute',
+    left: 0.0,
+    right: 0.0,
+    bottom: 0.0,
+    maxHeight: screenHeight / 2.4,
+  },
+  sheetIndicatorStyleSearching: {
+    width: 50,
+    height: 5.0,
+    backgroundColor: Colors.primaryColor,
+    borderRadius: Sizes.fixPadding,
+    marginVertical: Sizes.fixPadding * 2.0,
+    alignSelf: 'center',
+  },
+  buttonStyleSearching: {
+    flex: 1,
+    marginTop: Sizes.fixPadding * 3.0,
+    backgroundColor: Colors.primaryColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Sizes.fixPadding + 2.0,
+    borderColor: Colors.whiteColor,
+  },
+
 });

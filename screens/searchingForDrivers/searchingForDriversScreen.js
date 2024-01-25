@@ -120,7 +120,7 @@ const SearchingForDriversScreen = ({navigation}) => {
         onPress={ async () => {
           await finalizarPedidoDelivery();
         }}
-        style={styles.buttonStyle}>
+        style={styles.buttonStyleSearching}>
         <Text style={{...Fonts.whiteColor18Bold}}>Finalizar Pedido</Text>
       </TouchableOpacity>
       </Animatable.View>
@@ -220,7 +220,7 @@ const SearchingForDriversScreen = ({navigation}) => {
             await finalizarPedidoDelivery();
             navigation.push('Home');
           }}
-          style={{...styles.buttonStyle, marginRight: Sizes.fixPadding - 8.5}}>
+          style={{...styles.buttonStyleSearching, marginRight: Sizes.fixPadding - 8.5}}>
           <Text numberOfLines={1} style={{...Fonts.whiteColor18Bold}}>
             Cancelar
           </Text>
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     marginVertical: Sizes.fixPadding * 2.0,
     alignSelf: 'center',
   },
-  buttonStyle: {
+  buttonStyleSearching: {
     flex: 1,
     marginTop: Sizes.fixPadding * 3.0,
     backgroundColor: Colors.primaryColor,
