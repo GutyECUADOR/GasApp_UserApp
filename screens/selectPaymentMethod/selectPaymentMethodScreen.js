@@ -50,6 +50,7 @@ const SelectPaymentMethodScreen = ({navigation}) => {
   const createPedidoDelivery = async () => {
      const nuevoPedido = await firestore().collection('pedidos').add({
       delivery: null,
+      status: 'Pendiente',
       client: {
         name: user.name,
         email: user.email,

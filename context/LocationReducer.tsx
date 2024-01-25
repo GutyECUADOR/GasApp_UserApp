@@ -6,6 +6,7 @@ export interface LocationState {
     location: Location;
     deliveryLocation: Location;
     delivery: Delivery | null;
+    statusDelivery: string;
     hasPedidoActivo: boolean;
     pedidoActivoID: string;
     duration: number;
@@ -20,6 +21,7 @@ type LocationAction = |
     | { type: 'setAddress', payload: string }
     | { type: 'setDeliverylocation', payload: { location: Location } }
     | { type: 'setDelivery', payload: { delivery: Delivery | null } }
+    | { type: 'setStatusDelivery', payload: string }
     | { type: 'sethasLocation', payload: boolean }
     | { type: 'setHasPedidoActivo', payload: boolean }
     | { type: 'setPedidoActivoID', payload: string }
@@ -59,6 +61,13 @@ export const LocationReducer = ( state: LocationState, action: LocationAction) :
             }
             break;
         
+        case 'setStatusDelivery':
+            return {
+                ...state,
+                statusDelivery: action.payload
+            }
+            break;
+
         case 'sethasLocation':
             return {
                 ...state,

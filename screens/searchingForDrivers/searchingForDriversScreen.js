@@ -21,7 +21,7 @@ import { LocationContext } from '../../context/LocationContext';
 import firestore from '@react-native-firebase/firestore';
 
 const SearchingForDriversScreen = ({navigation}) => {
-  const { locationState, setDistance, setDuration, setDelivery } = useContext(LocationContext);
+  const { locationState, setDistance, setDuration, setDelivery, setStatusDelivery } = useContext(LocationContext);
   
   const finalizarPedidoDelivery = async () => {
     await firestore()
@@ -31,18 +31,21 @@ const SearchingForDriversScreen = ({navigation}) => {
       .then(() => {
         console.log(`Pedido ${locationState.pedidoActivoID} cancelado/finalizado`);
       });
+
+      navigation.push('Rating');
   }
 
+  //Watch del pedido activo
   useEffect(() => {
     const subscriber = firestore()
       .collection('pedidos')
       .doc(locationState.pedidoActivoID)
       .onSnapshot(documentSnapshot => {
         if (documentSnapshot.exists) {
-          const delivery = documentSnapshot.get('delivery');
+          const statusDelivery = documentSnapshot.get('status');
           console.log('User data: ', documentSnapshot.data());
-          console.log('Delivery del pedido: ', delivery);
-          if (delivery) {
+          if (statusDelivery == 'En Proceso') {
+            const delivery = documentSnapshot.get('delivery');
             setDelivery({
               coordinate: {
                 latitude: delivery.coordinate.latitude,
@@ -52,10 +55,16 @@ const SearchingForDriversScreen = ({navigation}) => {
               email: delivery.email,
               phone: delivery.phone
             });
+            setStatusDelivery(statusDelivery);
           }else{
+            setStatusDelivery(statusDelivery);
+            if (statusDelivery == 'Finalizado') {
+              finalizarPedidoDelivery();
+            }
             setDelivery(null);
           }
         }else{
+          setStatusDelivery('Pendiente');
           setDelivery(null);
         }
       });
@@ -75,8 +84,10 @@ const SearchingForDriversScreen = ({navigation}) => {
       <View style={{flex: 1}}>
         {displayMap()}
       </View>
-      { console.log(locationState.delivery) }
-      { locationState.delivery == null ? searchingDriverSheet() : driverInfoSheet() }
+      { console.log('locationState.delivery', locationState.statusDelivery) }
+      { locationState.statusDelivery == 'Pendiente' && searchingDriverSheet() }
+      { locationState.statusDelivery == 'En Proceso' && driverInfoSheet() }
+      
     </View>
   );
 
@@ -108,7 +119,6 @@ const SearchingForDriversScreen = ({navigation}) => {
         activeOpacity={0.8}
         onPress={ async () => {
           await finalizarPedidoDelivery();
-          navigation.push('Rating');
         }}
         style={styles.buttonStyle}>
         <Text style={{...Fonts.whiteColor18Bold}}>Finalizar Pedido</Text>

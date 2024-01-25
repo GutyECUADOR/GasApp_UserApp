@@ -22,6 +22,7 @@ export const locationInitialState: LocationState = {
     location: new LocationClass(0, 0),
     deliveryLocation: new LocationClass(0, 0), // Utilizada para el delivery más cercano
     delivery: null,  // Utilizado para registrar valor del delivery que acepto el pedido
+    statusDelivery: '', // Utilizado para saber en que estado esta el pedido
     hasPedidoActivo: false,
     pedidoActivoID: '',
     amount: 0,
@@ -38,6 +39,7 @@ export interface LocationContextProps {
     setLocation: (location: Location) => void;
     setDeliveryLocation: (location: Location) => void;
     setDelivery: (delivery: Delivery | null) => void;
+    setStatusDelivery: (status: string) => void;
     setHasLocation: (hasLocation: boolean) => void;
     setHasPedidoActivo: (hasLocation: boolean) => void;
     setPedidoActivoID: (firestoreID: string) => void;
@@ -93,6 +95,10 @@ export const LocationProvider = ({ children }: any) => {
         dispatch({type: 'setDelivery', payload: {delivery}})
     }
 
+    const setStatusDelivery = (status: string) => {
+        dispatch({type: 'setStatusDelivery', payload: status})
+    }
+
     const setHasLocation = (hasLocation: boolean) => {
         dispatch({type: 'sethasLocation', payload: hasLocation})
     }
@@ -134,6 +140,7 @@ export const LocationProvider = ({ children }: any) => {
             setLocation,
             setDeliveryLocation,
             setDelivery,
+            setStatusDelivery,
             setHasLocation,
             setHasPedidoActivo,
             setPedidoActivoID,
