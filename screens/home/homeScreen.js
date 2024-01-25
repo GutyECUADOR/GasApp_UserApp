@@ -9,7 +9,8 @@ import {
   Platform,
   Button,
   ActivityIndicator,
-  Alert
+  Alert,
+  ImageBackground
 } from 'react-native';
 import {Key} from '../../constants/key';
 import React, {useState, useEffect, useCallback, useRef, useContext} from 'react';
@@ -62,7 +63,7 @@ const HomeScreen = ({navigation}) => {
 
   // Contexts
   const { user } = useContext(AuthContext)
-  const { locationState, setLocation, setDistance, setDuration, setDeliveryLocation, getAddress, getCurrentLocation, setHasPedidoActivo, setPedidoActivoID } = useContext(LocationContext);
+  const { locationState, setLocation, setDistance, setDuration, setDeliveryLocation, setDelivery, getAddress, getCurrentLocation, setHasPedidoActivo, setPedidoActivoID, setStatusDelivery } = useContext(LocationContext);
 
   const mapViewRef = useRef();
 
@@ -114,6 +115,44 @@ const HomeScreen = ({navigation}) => {
     // Unsubscribe from events when no longer in use
     return () => subscriber();
   }, [locationState.location]);
+
+  //Watch del pedido activo
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('pedidos')
+      .doc(locationState.pedidoActivoID)
+      .onSnapshot(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          const statusDelivery = documentSnapshot.get('status');
+          console.log('User data: ', documentSnapshot.data());
+          if (statusDelivery == 'En Proceso') {
+            const delivery = documentSnapshot.get('delivery');
+            setDelivery({
+              coordinate: {
+                latitude: delivery.coordinate.latitude,
+                longitude: delivery.coordinate.longitude
+              },
+              name: delivery.name,
+              email: delivery.email,
+              phone: delivery.phone
+            });
+            setpedidoStep(appState.DeliveryIniciado);
+            
+          }else if(statusDelivery == 'Finalizado'){
+            
+            /* setStatusDelivery(statusDelivery); */
+              setpedidoStep(appState.DeliveryFinalizado);
+              finalizarPedidoDelivery();
+              setDelivery(null);
+          }
+        }else{
+          setStatusDelivery('Pendiente');
+          setDelivery(null);
+        }
+      });
+  
+    return () => subscriber();
+  }, [locationState.pedidoActivoID])
 
   // Obtener dirección de las coordenadas
   useEffect(() => {
@@ -494,7 +533,7 @@ const HomeScreen = ({navigation}) => {
         animation="slideInUp"
         iterationCount={1}
         duration={1500}
-        style={{...styles.bottomSheetWrapStyle}}>
+        style={{...styles.bottomSheetWrapStyleDriver}}>
         {driverInfo()}
        
         <TouchableOpacity
@@ -506,6 +545,84 @@ const HomeScreen = ({navigation}) => {
         <Text style={{...Fonts.whiteColor18Bold}}>Finalizar Pedido</Text>
       </TouchableOpacity>
       </Animatable.View>
+    );
+  }
+
+  function driverInfo() {
+    return (
+      <View style={{marginTop: Sizes.fixPadding}}>
+        {driverImageWithCallAndMessage()}
+        {driverDetail()}
+      </View>
+    );
+  }
+
+  function driverImageWithCallAndMessage() {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View style={{alignItems: 'center', justifyContent: 'center'}}>
+          <ImageBackground
+            source={require('../../assets/images/users/nouser.png')}
+            style={styles.driverImageStyle}>
+            
+          </ImageBackground>
+        </View>
+        
+      </View>
+    );
+  }
+
+  function driverDetail() {
+    return (
+      <View
+        style={{
+          marginTop: Sizes.fixPadding,
+          marginBottom: Sizes.fixPadding * 3.0,
+        }}>
+        <Text style={{textAlign: 'center', ...Fonts.blackColor17SemiBold}}>
+          { locationState.delivery?.name }
+        </Text>
+        <View style={styles.rideInfoWrapStyle}>
+          <View
+            style={{
+              maxWidth: screenWidth / 2.5,
+              marginHorizontal: Sizes.fixPadding + 9.0,
+              alignItems: 'center',
+            }}>
+            <Text numberOfLines={1} style={{...Fonts.grayColor14Regular}}>
+              Contácto
+            </Text>
+            <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
+              { locationState.delivery?.email }
+            </Text>
+            <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
+              { locationState.delivery?.phone }
+            </Text>
+          </View>
+          <View
+            style={{
+              maxWidth: screenWidth / 2.5,
+              marginHorizontal: Sizes.fixPadding + 9.0,
+              alignItems: 'center',
+            }}>
+            <Text numberOfLines={1} style={{...Fonts.grayColor14Regular}}>
+              Tiempo Estimado
+            </Text>
+            <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
+              { locationState.distance.toFixed(2) } Km 
+            </Text>
+            <Text numberOfLines={1} style={{...Fonts.blackColor15SemiBold}}>
+              { locationState.duration.toFixed(2) } min
+            </Text>
+          </View>
+          
+        </View>
+      </View>
     );
   }
   
@@ -828,5 +945,14 @@ const styles = StyleSheet.create({
     paddingVertical: Sizes.fixPadding + 2.0,
     borderColor: Colors.whiteColor,
   },
-
+  // OnRude Styles
+  driverImageStyle: {
+    width: screenWidth / 4.0,
+    height: screenWidth / 4.0,
+    backgroundColor: 'orange',
+    borderRadius: screenWidth / 4.0 / 2.0,
+    marginHorizontal: Sizes.fixPadding * 2.0,
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+  },
 });
