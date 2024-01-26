@@ -24,10 +24,11 @@ export const locationInitialState: LocationState = {
     delivery: null,  // Utilizado para registrar valor del delivery que acepto el pedido
     statusDelivery: '', // Utilizado para saber en que estado esta el pedido
     hasPedidoActivo: false,
-    pedidoActivoID: '',
+    pedidoActivoID: null,
     amount: 0,
     distance: 0,
-    duration: 0
+    duration: 0,
+    paymentMethodIndex: 0
    
 }
 
@@ -46,6 +47,7 @@ export interface LocationContextProps {
     setAmount: (amount: number) => void;
     setDistance: (distance: number) => void;
     setDuration: (duration: number) => void;
+    setPaymentMethodIndex: (paymentMethodIndex: number) => void;
 }
 
 export const LocationContext = createContext({} as LocationContextProps);
@@ -115,12 +117,16 @@ export const LocationProvider = ({ children }: any) => {
         dispatch({type: 'setAmount', payload: amount})
     }
 
-    const setDistance = (amount: number) => {
-        dispatch({type: 'setDistance', payload: amount})
+    const setDistance = (distance: number) => {
+        dispatch({type: 'setDistance', payload: distance})
     }
 
-    const setDuration = (amount: number) => {
-        dispatch({type: 'setDuration', payload: amount})
+    const setDuration = (duration: number) => {
+        dispatch({type: 'setDuration', payload: duration})
+    }
+
+    const setPaymentMethodIndex = (paymentMethodIndex: number) => {
+        dispatch({type: 'setPaymentMethodIndex', payload: paymentMethodIndex})
     }
 
     useEffect(() => {
@@ -148,7 +154,8 @@ export const LocationProvider = ({ children }: any) => {
             getAddress,
             setAmount,
             setDistance,
-            setDuration
+            setDuration,
+            setPaymentMethodIndex
         }}>
             { children }
         </LocationContext.Provider>

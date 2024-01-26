@@ -32,6 +32,7 @@ import { LocationClass, LocationContext } from '../../context/LocationContext';
 const HomeScreen = ({navigation}) => {
 
   // Constantes
+  // Verificar Métodos de pago segun DB
   const paymentmethods = [
     {
       id: '1',
@@ -59,11 +60,11 @@ const HomeScreen = ({navigation}) => {
   const [pedidoStep, setpedidoStep] = useState(appState.SinPedido)
   const [backClickCount, setBackClickCount] = useState(0);
   const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([])
-  const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] = useState(0);
+  /* const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] = useState(0); */
 
   // Contexts
   const { user } = useContext(AuthContext)
-  const { locationState, setLocation, setDistance, setDuration, setDeliveryLocation, setDelivery, getAddress, getCurrentLocation, setHasPedidoActivo, setPedidoActivoID, setStatusDelivery } = useContext(LocationContext);
+  const { locationState, setLocation, setDistance, setDuration, setDeliveryLocation, setDelivery, getAddress, getCurrentLocation, setHasPedidoActivo, setPedidoActivoID, setStatusDelivery, setPaymentMethodIndex } = useContext(LocationContext);
 
   const mapViewRef = useRef();
 
@@ -84,12 +85,15 @@ const HomeScreen = ({navigation}) => {
       .delete()
       .then(() => {
         console.log(`Pedido ${locationState.pedidoActivoID} finalizado`);
+        
         setDeliveryLocation(null)
+        setPedidoActivoID(null);
+        setDelivery(null);
+        setpedidoStep(appState.DeliveryFinalizado);
       });
 
-      setpedidoStep(appState.DeliveryFinalizado);
-      setDelivery(null);
       navigation.push('Rating');
+
   }
 
   // Watch de distribuidores activos en firestore
@@ -127,35 +131,41 @@ const HomeScreen = ({navigation}) => {
 
   //Watch del pedido activo
   useEffect(() => {
+
+    if (locationState.pedidoActivoID == null) {
+      return;
+    }
+
     const subscriber = firestore()
       .collection('pedidos')
       .doc(locationState.pedidoActivoID)
       .onSnapshot(documentSnapshot => {
         if (documentSnapshot.exists) {
           const statusDelivery = documentSnapshot.get('status');
-          console.log('User data: ', documentSnapshot.data());
-          if (statusDelivery == 'En Proceso') {
-            const delivery = documentSnapshot.get('delivery');
-            setDelivery({
-              coordinate: {
-                latitude: delivery.coordinate.latitude,
-                longitude: delivery.coordinate.longitude
-              },
-              name: delivery.name,
-              email: delivery.email,
-              phone: delivery.phone
-            });
-            setpedidoStep(appState.DeliveryIniciado);
-            
-          }else if(statusDelivery == 'Finalizado'){
-            
-            /* setStatusDelivery(statusDelivery); */
-            finalizarPedidoDelivery();
-            
+          console.log('User data: ', statusDelivery);
+
+          switch (statusDelivery) {
+            case 'En Proceso':
+              const delivery = documentSnapshot.get('delivery');
+              setDelivery({
+                coordinate: {
+                  latitude: delivery.coordinate.latitude,
+                  longitude: delivery.coordinate.longitude
+                },
+                name: delivery.name,
+                email: delivery.email,
+                phone: delivery.phone
+              });
+              setpedidoStep(appState.DeliveryIniciado);
+              break;
+
+            case 'Finalizado':
+              finalizarPedidoDelivery();
+              break;
+          
+            default:
+              break;
           }
-        }else{
-          setStatusDelivery('Pendiente');
-          setDelivery(null);
         }
       });
   
@@ -413,7 +423,7 @@ const HomeScreen = ({navigation}) => {
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => {
-              setSelectedPaymentMethodIndex(index);
+              setPaymentMethodIndex(index);
             }}
             key={`${item.id}`}
             style={styles.paymentMethodWrapStyle}>
@@ -451,7 +461,7 @@ const HomeScreen = ({navigation}) => {
               style={{
                 ...styles.selectedMethodIndicatorStyle,
                 backgroundColor:
-                  selectedPaymentMethodIndex == index
+                  locationState.paymentMethodIndex == index
                     ? Colors.lightBlackColor
                     : Colors.shadowColor,
               }}>
@@ -599,6 +609,9 @@ const HomeScreen = ({navigation}) => {
         }}>
         <Text style={{textAlign: 'center', ...Fonts.blackColor17SemiBold}}>
           { locationState.delivery?.name }
+        </Text>
+        <Text style={{textAlign: 'center', ...Fonts.blackColor17SemiBold}}>
+          Forma de pago: { paymentmethods[locationState.paymentMethodIndex].paymentMethod }
         </Text>
         <View style={styles.rideInfoWrapStyle}>
           <View

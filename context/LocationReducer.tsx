@@ -8,10 +8,11 @@ export interface LocationState {
     delivery: Delivery | null;
     statusDelivery: string;
     hasPedidoActivo: boolean;
-    pedidoActivoID: string;
+    pedidoActivoID: string | null;
     duration: number;
     distance: number;
     amount: number;
+    paymentMethodIndex: number;
 }
 
 
@@ -24,10 +25,11 @@ type LocationAction = |
     | { type: 'setStatusDelivery', payload: string }
     | { type: 'sethasLocation', payload: boolean }
     | { type: 'setHasPedidoActivo', payload: boolean }
-    | { type: 'setPedidoActivoID', payload: string }
+    | { type: 'setPedidoActivoID', payload: string | null }
     | { type: 'setAmount', payload: number }
     | { type: 'setDistance', payload: number }
     | { type: 'setDuration', payload: number }
+    | { type: 'setPaymentMethodIndex', payload: number }
 
 /* El reducer hace las vaces de useState complejo */
 
@@ -107,6 +109,13 @@ export const LocationReducer = ( state: LocationState, action: LocationAction) :
             return {
                 ...state,
                 duration: action.payload
+            }
+            break;
+
+        case 'setPaymentMethodIndex':
+            return {
+                ...state,
+                paymentMethodIndex: action.payload
             }
             break;
 

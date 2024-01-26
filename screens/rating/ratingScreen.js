@@ -199,7 +199,7 @@ const RatingScreen = ({navigation}) => {
         }}>
         <View style={{alignItems: 'center', justifyContent: 'center'}}>
           <ImageBackground
-            source={require('../../assets/images/users/nouser.png')}
+            source={require('../../assets/images/app_icon.png')}
             style={styles.driverImageStyle}>
           </ImageBackground>
         </View>
@@ -210,6 +210,14 @@ const RatingScreen = ({navigation}) => {
             ...Fonts.blackColor17SemiBold,
           }}>
           Gracias por usar la app
+        </Text>
+        <Text
+          style={{
+            marginTop: Sizes.fixPadding,
+            textAlign: 'center',
+            ...Fonts.blackColor17SemiBold,
+          }}>
+          Dejanos un comentario sobre tu experiencia con el delivery, esto nos ayuda a mejorar.
         </Text>
       </View>
     );
