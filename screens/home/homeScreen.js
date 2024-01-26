@@ -71,15 +71,24 @@ const HomeScreen = ({navigation}) => {
     return array.sort((a, b) => a.distance - b.distance);
   }
 
+  const cancelarPedidoDelivery = async () => {
+      setpedidoStep(appState.SinPedido);
+      setDeliveryLocation(null)
+      navigation.push('Home');
+  }
+
   const finalizarPedidoDelivery = async () => {
     await firestore()
       .collection('pedidos')
       .doc(locationState.pedidoActivoID)
       .delete()
       .then(() => {
-        console.log(`Pedido ${locationState.pedidoActivoID} cancelado/finalizado`);
+        console.log(`Pedido ${locationState.pedidoActivoID} finalizado`);
+        setDeliveryLocation(null)
       });
 
+      setpedidoStep(appState.DeliveryFinalizado);
+      setDelivery(null);
       navigation.push('Rating');
   }
 
@@ -141,9 +150,8 @@ const HomeScreen = ({navigation}) => {
           }else if(statusDelivery == 'Finalizado'){
             
             /* setStatusDelivery(statusDelivery); */
-              setpedidoStep(appState.DeliveryFinalizado);
-              finalizarPedidoDelivery();
-              setDelivery(null);
+            finalizarPedidoDelivery();
+            
           }
         }else{
           setStatusDelivery('Pendiente');
@@ -271,21 +279,27 @@ const HomeScreen = ({navigation}) => {
 
   function confirmPaymentMethodButton() {
     return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={ async () => {
-          await createPedidoDelivery();
-          setpedidoStep(appState.BuscandoDelivery);
-        }}
-        style={{
-          ...styles.buttonStyle,
-          position: 'absolute',
-          bottom: 0.0,
-          right: 0.0,
-          left: 0.0,
-        }}>
-        <Text style={{...Fonts.whiteColor18Bold}}>Confirmar pago</Text>
-      </TouchableOpacity>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={ async () => {
+            await createPedidoDelivery();
+            setpedidoStep(appState.BuscandoDelivery);
+          }}
+          style={styles.buttonConfirmStyle}>
+          <Text style={{...Fonts.whiteColor18Bold}}>Confirmar pago</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={ async () => {
+            await cancelarPedidoDelivery()
+          }}
+          style={{
+            ...styles.buttonCancelStyle
+          }}>
+          <Text style={{...Fonts.whiteColor18Bold}}>Cancelar</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
@@ -294,8 +308,8 @@ const HomeScreen = ({navigation}) => {
   function paymentSheet() {
     return (
       <BottomSheet
-        isOpen={false}
-        sliderMinHeight={300}
+        isOpen={true}
+        sliderMinHeight={150}
         sliderMaxHeight={screenHeight - 150.0}
         lineContainerStyle={{
           height: 0.0,
@@ -514,9 +528,8 @@ const HomeScreen = ({navigation}) => {
           activeOpacity={0.8}
           onPress={ async () => {
             await finalizarPedidoDelivery();
-            setpedidoStep(appState.SinPedido);
           }}
-          style={{...styles.buttonStyleSearching, marginRight: Sizes.fixPadding - 8.5}}>
+          style={{...styles.buttonStyleSearching}}>
           <Text numberOfLines={1} style={{...Fonts.whiteColor18Bold}}>
             Cancelar
           </Text>
@@ -856,6 +869,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: Sizes.fixPadding + 3.0,
   },
+  buttonConfirmStyle: {
+    flex: 1,
+    marginTop: Sizes.fixPadding * 3.0,
+    backgroundColor: Colors.primaryColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Sizes.fixPadding + 2.0,
+    borderColor: Colors.whiteColor,
+  },
+  buttonCancelStyle: {
+    flex: 1,
+    marginTop: Sizes.fixPadding * 3.0,
+    backgroundColor: Colors.redColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Sizes.fixPadding + 2.0,
+    borderColor: Colors.whiteColor,
+  },
   dropLocationInfoWrapStyle: {
     marginHorizontal: Sizes.fixPadding * 2.0,
     flexDirection: 'row',
@@ -922,11 +953,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: Sizes.fixPadding * 2.5,
     borderTopRightRadius: Sizes.fixPadding * 2.5,
     backgroundColor: Colors.whiteColor,
+    paddingHorizontal: 0.0,
     position: 'absolute',
+    bottom: 0.0,
     left: 0.0,
     right: 0.0,
-    bottom: 0.0,
-    maxHeight: screenHeight / 2.4,
   },
   sheetIndicatorStyleSearching: {
     width: 50,
@@ -946,6 +977,12 @@ const styles = StyleSheet.create({
     borderColor: Colors.whiteColor,
   },
   // OnRude Styles
+  rideInfoWrapStyle: {
+    marginTop: Sizes.fixPadding,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   driverImageStyle: {
     width: screenWidth / 4.0,
     height: screenWidth / 4.0,

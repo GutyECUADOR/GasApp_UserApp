@@ -4,7 +4,7 @@ export interface LocationState {
     hasLocation: boolean;
     address: string;
     location: Location;
-    deliveryLocation: Location;
+    deliveryLocation: Location | null;
     delivery: Delivery | null;
     statusDelivery: string;
     hasPedidoActivo: boolean;
@@ -19,7 +19,7 @@ export interface LocationState {
 type LocationAction = | 
     { type: 'setLocation', payload: { location: Location }}
     | { type: 'setAddress', payload: string }
-    | { type: 'setDeliverylocation', payload: { location: Location } }
+    | { type: 'setDeliverylocation', payload: { location: Location | null } }
     | { type: 'setDelivery', payload: { delivery: Delivery | null } }
     | { type: 'setStatusDelivery', payload: string }
     | { type: 'sethasLocation', payload: boolean }

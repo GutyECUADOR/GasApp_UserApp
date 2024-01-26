@@ -20,7 +20,7 @@ export const locationInitialState: LocationState = {
     hasLocation: false,
     address: 'Mi Ubicación Actual',
     location: new LocationClass(0, 0),
-    deliveryLocation: new LocationClass(0, 0), // Utilizada para el delivery más cercano
+    deliveryLocation: null, // Utilizada para el delivery más cercano
     delivery: null,  // Utilizado para registrar valor del delivery que acepto el pedido
     statusDelivery: '', // Utilizado para saber en que estado esta el pedido
     hasPedidoActivo: false,
