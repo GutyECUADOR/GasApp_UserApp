@@ -142,7 +142,7 @@ const HomeScreen = ({navigation}) => {
       .onSnapshot(documentSnapshot => {
         if (documentSnapshot.exists) {
           const statusDelivery = documentSnapshot.get('status');
-          console.log('User data: ', statusDelivery);
+          console.log('statusDelivery: ', statusDelivery);
 
           switch (statusDelivery) {
             case 'En Proceso':
@@ -182,6 +182,7 @@ const HomeScreen = ({navigation}) => {
     const nuevoPedido = await firestore().collection('pedidos').add({
      delivery: null,
      status: 'Pendiente',
+     date: Date.now(),
      client: {
        name: user.name,
        email: user.email,
@@ -541,7 +542,7 @@ const HomeScreen = ({navigation}) => {
           }}
           style={{...styles.buttonStyleSearching}}>
           <Text numberOfLines={1} style={{...Fonts.whiteColor18Bold}}>
-            Cancelar
+            Cancelar mi pedido
           </Text>
         </TouchableOpacity>
         

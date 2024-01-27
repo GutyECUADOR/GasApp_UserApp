@@ -60,8 +60,7 @@ const DrawerNavigation = () => {
 export const Navigator = () => {
 
   const { status } = useContext( AuthContext );
-  console.log('Navigation: '+status)
-
+  
   if (status === "checking") {
     return <LoadingScreen></LoadingScreen>
   }
