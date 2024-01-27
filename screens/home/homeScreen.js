@@ -78,7 +78,15 @@ const HomeScreen = ({navigation}) => {
       navigation.push('Home');
   }
 
-  const finalizarPedidoDelivery = async () => {
+  const finalizarPedidoDelivery = async (pedidoID) => {
+    await firestore().collection('pedidos').doc(pedidoID).update({
+      status: 'Finalizado'
+    }).then(() => {
+      console.log('Pedido finalizado!');
+    });
+  }
+
+  const deletePedidoDelivery = async () => {
     await firestore()
       .collection('pedidos')
       .doc(locationState.pedidoActivoID)
@@ -90,9 +98,10 @@ const HomeScreen = ({navigation}) => {
         setPedidoActivoID(null);
         setDelivery(null);
         setpedidoStep(appState.DeliveryFinalizado);
+        navigation.push('Rating');
       });
 
-      navigation.push('Rating');
+      
 
   }
 
@@ -160,7 +169,12 @@ const HomeScreen = ({navigation}) => {
               break;
 
             case 'Finalizado':
-              finalizarPedidoDelivery();
+              Alert.alert('Pedido finalizado', 'El delivery se ha marcado como finalizado. Gracias por utilizar la app', [ {
+                text: 'Aceptar',
+                onPress: () => {
+                  deletePedidoDelivery();
+                },
+              }]);
               break;
           
             default:
@@ -280,7 +294,6 @@ const HomeScreen = ({navigation}) => {
           console.log(deliveryLocationByDistance)
           await setDeliveryLocation(closestLocation);
           setpedidoStep(appState.SeleccionandoPago);
-          /* navigation.push('SelectPaymentMethod'); */
         }}
         style={styles.buttonStyle}>
         <Text style={{...Fonts.whiteColor18Bold}}>Solicitar</Text>
@@ -538,7 +551,7 @@ const HomeScreen = ({navigation}) => {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={ async () => {
-            await finalizarPedidoDelivery();
+            await deletePedidoDelivery();
           }}
           style={{...styles.buttonStyleSearching}}>
           <Text numberOfLines={1} style={{...Fonts.whiteColor18Bold}}>
@@ -563,7 +576,7 @@ const HomeScreen = ({navigation}) => {
         <TouchableOpacity
         activeOpacity={0.8}
         onPress={ async () => {
-          await finalizarPedidoDelivery();
+          await finalizarPedidoDelivery(locationState.pedidoActivoID);
         }}
         style={styles.buttonStyle}>
         <Text style={{...Fonts.whiteColor18Bold}}>Finalizar Pedido</Text>
