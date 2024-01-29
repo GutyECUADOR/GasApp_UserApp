@@ -60,8 +60,7 @@ const HomeScreen = ({navigation}) => {
   const [pedidoStep, setpedidoStep] = useState(appState.SinPedido)
   const [backClickCount, setBackClickCount] = useState(0);
   const [distribuidoresCercanos, setDistribuidoresCercanos] = useState([])
-  /* const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] = useState(0); */
-
+  
   // Contexts
   const { user, registerPedidoFinalizado } = useContext(AuthContext)
   const { locationState, setLocation, setDistance, setDuration, setDeliveryLocation, setDelivery, getAddress, getCurrentLocation, setHasPedidoActivo, setPedidoActivoID, setStatusDelivery, setPaymentMethodIndex } = useContext(LocationContext);
@@ -88,9 +87,9 @@ const HomeScreen = ({navigation}) => {
 
   const deletePedidoDelivery = async () => {
     // Register on DB Laravel
-    registerPedidoFinalizado({
+    await registerPedidoFinalizado({
       id_usuario: user.id,
-      id_delivery: 1,
+      id_delivery: 1, //TODO recuperar ID del delivery activo
       address: locationState.address,
       distance: locationState.distance,
       payment_method_id: locationState.paymentMethodIndex,
@@ -177,7 +176,6 @@ const HomeScreen = ({navigation}) => {
                 phone: delivery.phone
               });
               setpedidoStep(appState.DeliveryIniciado);
-              console.log('Delivery:', locationState.delivery);
               break;
 
             case 'Finalizado':
@@ -624,7 +622,7 @@ const HomeScreen = ({navigation}) => {
           { locationState.delivery?.name }
         </Text>
         <Text style={{textAlign: 'center', ...Fonts.blackColor17SemiBold}}>
-          Forma de pago: { paymentmethods[locationState.paymentMethodIndex].paymentMethod }
+          Forma de pago: { paymentmethods[locationState.paymentMethodIndex-1]?.paymentMethod }
         </Text>
         <View style={styles.rideInfoWrapStyle}>
           <View
