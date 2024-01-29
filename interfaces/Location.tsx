@@ -4,6 +4,7 @@ export interface Location {
 }
 
 export interface Delivery {
+    id: number,
     coordinate: Location,
     name: string,
     email: string,

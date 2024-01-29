@@ -27,7 +27,7 @@ import { getDistance } from 'geolib';
 
 import firestore from '@react-native-firebase/firestore';
 import { AuthContext } from '../../context/AuthContext';
-import { LocationClass, LocationContext } from '../../context/LocationContext';
+import { LocationContext } from '../../context/LocationContext';
 
 const HomeScreen = ({navigation}) => {
 
@@ -35,13 +35,13 @@ const HomeScreen = ({navigation}) => {
   // Verificar Métodos de pago segun DB
   const paymentmethods = [
     {
-      id: '1',
+      id: 1,
       paymentIcon: require('../../assets/images/paymentMethods/cash.png'),
       paymentType: 'cash',
       paymentMethod: 'Efectivo',
     },
     {
-      id: '2',
+      id: 2,
       paymentIcon: require('../../assets/images/paymentMethods/wallet.png'),
       paymentType: 'other',
       paymentMethod: 'Transferencia Bancaria',
@@ -63,7 +63,7 @@ const HomeScreen = ({navigation}) => {
   /* const [selectedPaymentMethodIndex, setSelectedPaymentMethodIndex] = useState(0); */
 
   // Contexts
-  const { user } = useContext(AuthContext)
+  const { user, registerPedidoFinalizado } = useContext(AuthContext)
   const { locationState, setLocation, setDistance, setDuration, setDeliveryLocation, setDelivery, getAddress, getCurrentLocation, setHasPedidoActivo, setPedidoActivoID, setStatusDelivery, setPaymentMethodIndex } = useContext(LocationContext);
 
   const mapViewRef = useRef();
@@ -87,6 +87,16 @@ const HomeScreen = ({navigation}) => {
   }
 
   const deletePedidoDelivery = async () => {
+    // Register on DB Laravel
+    registerPedidoFinalizado({
+      id_usuario: user.id,
+      id_delivery: 1,
+      address: locationState.address,
+      distance: locationState.distance,
+      payment_method_id: locationState.paymentMethodIndex,
+      status: 1
+    });
+
     await firestore()
       .collection('pedidos')
       .doc(locationState.pedidoActivoID)
@@ -157,6 +167,7 @@ const HomeScreen = ({navigation}) => {
             case 'En Proceso':
               const delivery = documentSnapshot.get('delivery');
               setDelivery({
+                id: delivery.id,
                 coordinate: {
                   latitude: delivery.coordinate.latitude,
                   longitude: delivery.coordinate.longitude
@@ -166,6 +177,7 @@ const HomeScreen = ({navigation}) => {
                 phone: delivery.phone
               });
               setpedidoStep(appState.DeliveryIniciado);
+              console.log('Delivery:', locationState.delivery);
               break;
 
             case 'Finalizado':
@@ -437,7 +449,8 @@ const HomeScreen = ({navigation}) => {
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => {
-              setPaymentMethodIndex(index);
+              console.log(item.id);
+              setPaymentMethodIndex(item.id);
             }}
             key={`${item.id}`}
             style={styles.paymentMethodWrapStyle}>
@@ -446,36 +459,22 @@ const HomeScreen = ({navigation}) => {
                 source={item.paymentIcon}
                 style={{width: 40.0, height: 40.0, resizeMode: 'contain'}}
               />
-              {item.paymentType == 'card' ? (
-                <View style={{marginLeft: Sizes.fixPadding + 5.0, flex: 1}}>
-                  <Text
-                    numberOfLines={1}
-                    style={{...Fonts.blackColor16SemiBold}}>
-                    {item.cardNumber}
-                  </Text>
-                  <Text
-                    numberOfLines={1}
-                    style={{...Fonts.grayColor12SemiBold}}>
-                    Expires 04/25
-                  </Text>
-                </View>
-              ) : (
-                <Text
-                  numberOfLines={1}
-                  style={{
-                    marginLeft: Sizes.fixPadding + 5.0,
-                    flex: 1,
-                    ...Fonts.blackColor16SemiBold,
-                  }}>
-                  {item.paymentMethod}
-                </Text>
-              )}
+              <Text
+                numberOfLines={1}
+                style={{
+                  marginLeft: Sizes.fixPadding + 5.0,
+                  flex: 1,
+                  ...Fonts.blackColor16SemiBold,
+                }}>
+                {item.paymentMethod}
+              </Text>
+              
             </View>
             <View
               style={{
                 ...styles.selectedMethodIndicatorStyle,
                 backgroundColor:
-                  locationState.paymentMethodIndex == index
+                  locationState.paymentMethodIndex == item.id
                     ? Colors.lightBlackColor
                     : Colors.shadowColor,
               }}>

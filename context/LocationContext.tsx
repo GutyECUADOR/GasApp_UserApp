@@ -28,7 +28,7 @@ export const locationInitialState: LocationState = {
     amount: 0,
     distance: 0,
     duration: 0,
-    paymentMethodIndex: 0
+    paymentMethodIndex: 1
    
 }
 

@@ -15,7 +15,7 @@ type AuthContextProps = {
     logOut: () => void;
     removeError: () => void;
     removeRegisterError : () => void;
-    registerPedido : ( pedidoData: PedidoData) => Promise<void>;
+    registerPedidoFinalizado : ( pedidoData: PedidoData) => Promise<void>;
     sendComentario : ( comentario: Comentario) => Promise<void>;
 }
 
@@ -150,7 +150,7 @@ export const AuthProvider = ({ children }:any) => {
     };
 
     /* Registrar pedido finalziado en DB local */
-    const registerPedido = async ( {id_delivery, id_usuario, address, distance, payment_method_id, status}: PedidoData) => {
+    const registerPedidoFinalizado = async ( {id_delivery, id_usuario, address, distance, payment_method_id, status}: PedidoData) => {
         const token = await AsyncStorage.getItem('token');
         if (!token) {
             return dispatch({ type: 'notAuthenticated' })
@@ -204,7 +204,7 @@ export const AuthProvider = ({ children }:any) => {
             logOut,
             removeRegisterError,
             removeError,
-            registerPedido,
+            registerPedidoFinalizado,
             sendComentario
         }}>
             { children }
