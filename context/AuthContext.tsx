@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useEffect} from 'react';
-import { LoginData, RegisterData, LoginResponse, User } from '../interfaces/appInterfaces';
+import { LoginData, RegisterData, LoginResponse, User, Comentario, ComentarioResponse, PedidoData, PedidoResponse } from '../interfaces/appInterfaces';
 import { authReducer, AuthState } from './authReducer';
 import gasAPI from '../api/gasAPI';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,6 +15,8 @@ type AuthContextProps = {
     logOut: () => void;
     removeError: () => void;
     removeRegisterError : () => void;
+    registerPedido : ( pedidoData: PedidoData) => Promise<void>;
+    sendComentario : ( comentario: Comentario) => Promise<void>;
 }
 
 const authInitialState: AuthState = {
@@ -78,7 +80,6 @@ export const AuthProvider = ({ children }:any) => {
 
     }
     
-
     const signIn = async ( {email, password}: LoginData) => {
         
         try {
@@ -148,6 +149,52 @@ export const AuthProvider = ({ children }:any) => {
         dispatch({ type: 'removeRegisterError' });
     };
 
+    /* Registrar pedido finalziado en DB local */
+    const registerPedido = async ( {id_delivery, id_usuario, address, distance, payment_method_id, status}: PedidoData) => {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+            return dispatch({ type: 'notAuthenticated' })
+        }
+
+        try {
+            const { data } = await gasAPI.post<PedidoResponse>('/api/pedido', {id_delivery, id_usuario, address, distance, payment_method_id, status}, {
+                headers: {
+                    'Accept': 'application/json', 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }   
+                });
+            
+        } catch (error: any) {
+            console.log(error.response.data);
+        }
+
+    };
+
+    const sendComentario = async ( {id_usuario, comentario}: Comentario) => {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+            return dispatch({ type: 'notAuthenticated' })
+        }
+        
+        try {
+            const { data } = await gasAPI.post<ComentarioResponse>('/api/comentario', {id_usuario, comentario}, {
+                headers: {
+                    'Accept': 'application/json', 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                } 
+                });
+            
+           
+            console.log(data);
+
+        } catch (error: any) {
+            console.log(error.response.data);
+        }
+
+    };
+
 
     return (
         <AuthContext.Provider value={{
@@ -157,6 +204,8 @@ export const AuthProvider = ({ children }:any) => {
             logOut,
             removeRegisterError,
             removeError,
+            registerPedido,
+            sendComentario
         }}>
             { children }
         </AuthContext.Provider>

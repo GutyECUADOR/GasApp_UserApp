@@ -7,32 +7,33 @@ import {
   TextInput,
   ImageBackground,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Colors, Fonts, Sizes, screenWidth} from '../../constants/styles';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MyStatusBar from '../../components/myStatusBar';
+import { AuthContext } from '../../context/AuthContext';
 
 const RatingScreen = ({navigation}) => {
+
+  const { user, sendComentario } = useContext(AuthContext)
   const [rate1, setRate1] = useState(true);
   const [rate2, setRate2] = useState(true);
   const [rate3, setRate3] = useState(true);
   const [rate4, setRate4] = useState(true);
   const [rate5, setRate5] = useState(false);
-  const [compliment, setCompliment] = useState('');
+  const [comentario, setComentario] = useState('');
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.whiteColor}}>
       <MyStatusBar />
       <View style={{flex: 1}}>
-        {backArrow()}
         <ScrollView
           automaticallyAdjustKeyboardInsets={true}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{paddingBottom: Sizes.fixPadding * 2.0}}>
           {driverInfo()}
-          {complimentInfo()}
+          {comentarioInfo()}
           {submitButton()}
         </ScrollView>
       </View>
@@ -57,6 +58,9 @@ const RatingScreen = ({navigation}) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => {
+          if (comentario.length > 0) {
+            sendComentario({'id_usuario':user.id, comentario});
+          }
           navigation.push('Home');
         }}
         style={styles.buttonStyle}>
@@ -65,11 +69,11 @@ const RatingScreen = ({navigation}) => {
     );
   }
 
-  function complimentInfo() {
+  function comentarioInfo() {
     return (
       <TextInput
-        value={compliment}
-        onChangeText={value => setCompliment(value)}
+        value={comentario}
+        onChangeText={value => setComentario(value)}
         style={styles.textFieldStyle}
         placeholder="Dejanos un comentario"
         placeholderTextColor={Colors.grayColor}

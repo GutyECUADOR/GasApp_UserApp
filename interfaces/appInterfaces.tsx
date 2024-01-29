@@ -5,7 +5,6 @@ export interface LoginData {
     password: string
 }
 
-
 export interface RegisterData {
     name: string, 
     phone: string, 
@@ -20,6 +19,14 @@ export interface LoginResponse {
     token_type:   string;
 }
 
+export interface ComentarioResponse {
+    message: string;
+}
+
+export interface PedidoResponse {
+    message: string;
+}
+
 export interface User {
     id:                number;
     name:              string;
@@ -30,4 +37,18 @@ export interface User {
     avatar:            string;
     created_at:        string;
     updated_at:        string;
+}
+
+export interface Comentario {
+    id_usuario: string,
+    comentario: string
+}
+
+export interface PedidoData {
+    id_usuario: string,
+    id_delivery: string,
+    payment_method_id: string,
+    distance: string,
+    address: string,
+    status: string,
 }
