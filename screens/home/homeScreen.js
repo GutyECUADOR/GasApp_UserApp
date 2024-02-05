@@ -65,7 +65,9 @@ const HomeScreen = ({navigation}) => {
   const { user, registerPedidoFinalizado } = useContext(AuthContext)
   const { locationState, setLocation, setDistance, setDuration, setDeliveryLocation, setDelivery, getAddress, getCurrentLocation, setHasPedidoActivo, setPedidoActivoID, setStatusDelivery, setPaymentMethodIndex } = useContext(LocationContext);
 
+  //Res
   const mapViewRef = useRef();
+  const firestoreRef = useRef();
 
   const sortByDistance = (array) => {
     return array.sort((a, b) => a.distance - b.distance);
@@ -86,31 +88,30 @@ const HomeScreen = ({navigation}) => {
   }
 
   const deletePedidoDelivery = async () => {
-    // Register on DB Laravel
-    await registerPedidoFinalizado({
-      id_usuario: user.id,
-      id_delivery: 1, //TODO recuperar ID del delivery activo
-      address: locationState.address,
-      distance: locationState.distance,
-      payment_method_id: locationState.paymentMethodIndex,
-      status: 1
-    });
 
+    firestoreRef.current();   
+
+    // Register on DB Laravel
+    
     await firestore()
       .collection('pedidos')
       .doc(locationState.pedidoActivoID)
       .delete()
       .then(() => {
-        console.log(`Pedido ${locationState.pedidoActivoID} finalizado`);
-        
-        setDeliveryLocation(null)
-        setPedidoActivoID(null);
-        setDelivery(null);
-        setpedidoStep(appState.DeliveryFinalizado);
-        navigation.push('Rating');
+        console.log(`Pedido finalizado ${locationState.pedidoActivoID}`);
       });
 
-      
+      await registerPedidoFinalizado({
+        id_usuario: user.id,
+        id_delivery: 1, //TODO recuperar ID del delivery activo
+        address: locationState.address,
+        distance: locationState.distance,
+        payment_method_id: locationState.paymentMethodIndex,
+        status: 1
+      });
+      await setDeliveryLocation(null)
+      await setpedidoStep(appState.DeliveryFinalizado);
+      navigation.push('Rating');
 
   }
 
@@ -148,12 +149,7 @@ const HomeScreen = ({navigation}) => {
   }, [locationState.location]);
 
   //Watch del pedido activo
-  useEffect(() => {
-
-    if (locationState.pedidoActivoID == null) {
-      return;
-    }
-
+  /* useEffect(() => {
     const subscriber = firestore()
       .collection('pedidos')
       .doc(locationState.pedidoActivoID)
@@ -181,8 +177,8 @@ const HomeScreen = ({navigation}) => {
             case 'Finalizado':
               Alert.alert('Pedido finalizado', 'El delivery se ha marcado como finalizado. Gracias por utilizar la app', [ {
                 text: 'Aceptar',
-                onPress: () => {
-                  deletePedidoDelivery();
+                onPress: async () => {
+                  await deletePedidoDelivery();
                 },
               }]);
               break;
@@ -192,9 +188,58 @@ const HomeScreen = ({navigation}) => {
           }
         }
       });
+
+    firestoreRef.current = subscriber;
+    return () => {
+      subscriber();
+    }
+  }, [locationState.pedidoActivoID]) */
+
+  const openWatchPedidoActivo = (pedidoActivoID) => {    
+    const subscriber = firestore()
+      .collection('pedidos')
+      .doc(pedidoActivoID)
+      .onSnapshot(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          const statusDelivery = documentSnapshot.get('status');
+          console.log('statusDelivery: ', statusDelivery);
+
+          switch (statusDelivery) {
+            case 'En Proceso':
+              const delivery = documentSnapshot.get('delivery');
+              setDelivery({
+                id: delivery.id,
+                coordinate: {
+                  latitude: delivery.coordinate.latitude,
+                  longitude: delivery.coordinate.longitude
+                },
+                name: delivery.name,
+                email: delivery.email,
+                phone: delivery.phone
+              });
+              setpedidoStep(appState.DeliveryIniciado);
+              break;
+
+            case 'Finalizado':
+              Alert.alert('Pedido finalizado', 'El delivery se ha marcado como finalizado. Gracias por utilizar la app', [ {
+                text: 'Aceptar',
+                onPress: async () => {
+                  await deletePedidoDelivery();
+                },
+              }]);
+              break;
+        
+          }
+        }
+      });
+
+    firestoreRef.current = subscriber;
+  }
   
-    return () => subscriber();
-  }, [locationState.pedidoActivoID])
+  const closeWatchPedidoActivo = () => {    
+    firestoreRef.current();        
+  }
+
 
   // Obtener dirección de las coordenadas
   useEffect(() => {
@@ -215,6 +260,7 @@ const HomeScreen = ({navigation}) => {
      }
    })
 
+   openWatchPedidoActivo(nuevoPedido.id);
    setHasPedidoActivo(true);
    setPedidoActivoID(nuevoPedido.id)
    console.log('ID nuevo Pedido', nuevoPedido.id);
