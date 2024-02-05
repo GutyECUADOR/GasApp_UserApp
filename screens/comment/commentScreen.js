@@ -14,14 +14,9 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MyStatusBar from '../../components/myStatusBar';
 import { AuthContext } from '../../context/AuthContext';
 
-const RatingScreen = ({navigation}) => {
+const CommentScreen = ({navigation}) => {
 
   const { user, sendComentario } = useContext(AuthContext)
-  const [rate1, setRate1] = useState(true);
-  const [rate2, setRate2] = useState(true);
-  const [rate3, setRate3] = useState(true);
-  const [rate4, setRate4] = useState(true);
-  const [rate5, setRate5] = useState(false);
   const [comentario, setComentario] = useState('');
 
   return (
@@ -34,7 +29,7 @@ const RatingScreen = ({navigation}) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{paddingBottom: Sizes.fixPadding * 2.0}}>
           {driverInfo()}
-          {ratingInfo()}
+          {comentarioInfo()}
           {submitButton()}
         </ScrollView>
       </View>
@@ -46,10 +41,10 @@ const RatingScreen = ({navigation}) => {
     return (
       <Text
         onPress={() => {
-          navigation.push('Comment');
+          navigation.push('Home');
         }}
         style={styles.backToHomeTextStyle}>
-        Dejar un comentario
+        Regresar al inicio
       </Text>
     );
   }
@@ -65,7 +60,7 @@ const RatingScreen = ({navigation}) => {
           navigation.push('Home');
         }}
         style={styles.buttonStyle}>
-        <Text style={{...Fonts.whiteColor18Bold}}>Calificar</Text>
+        <Text style={{...Fonts.whiteColor18Bold}}>Enviar comentarios</Text>
       </TouchableOpacity>
     );
   }
@@ -81,116 +76,6 @@ const RatingScreen = ({navigation}) => {
         cursorColor={Colors.primaryColor}
         selectionColor={Colors.primaryColor}
       />
-    );
-  }
-
-  function ratingInfo() {
-    return (
-      <View
-        style={{
-          marginVertical: Sizes.fixPadding * 3.0,
-          marginHorizontal: Sizes.fixPadding * 2.0,
-        }}>
-        <Text
-          style={{
-            marginBottom: Sizes.fixPadding,
-            textAlign: 'center',
-            ...Fonts.grayColor16Regular,
-          }}>
-            Califica el servicio del delivery
-        </Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <AntDesign
-            name="star"
-            size={22}
-            color={rate1 ? Colors.orangeColor : Colors.shadowColor}
-            onPress={() => {
-              if (rate1) {
-                setRate2(false);
-                setRate3(false);
-                setRate4(false);
-                setRate5(false);
-              } else {
-                setRate1(true);
-              }
-            }}
-            style={{marginHorizontal: Sizes.fixPadding - 5.0}}
-          />
-          <AntDesign
-            name="star"
-            size={22}
-            color={rate2 ? Colors.orangeColor : Colors.shadowColor}
-            onPress={() => {
-              if (rate2) {
-                setRate1(true);
-                setRate3(false);
-                setRate4(false);
-                setRate5(false);
-              } else {
-                setRate2(true);
-                setRate1(true);
-              }
-            }}
-            style={{marginHorizontal: Sizes.fixPadding - 5.0}}
-          />
-          <AntDesign
-            name="star"
-            size={22}
-            color={rate3 ? Colors.orangeColor : Colors.shadowColor}
-            onPress={() => {
-              if (rate3) {
-                setRate4(false);
-                setRate5(false);
-                setRate2(true);
-              } else {
-                setRate3(true);
-                setRate2(true);
-                setRate1(true);
-              }
-            }}
-            style={{marginHorizontal: Sizes.fixPadding - 5.0}}
-          />
-          <AntDesign
-            name="star"
-            size={22}
-            color={rate4 ? Colors.orangeColor : Colors.shadowColor}
-            onPress={() => {
-              if (rate4) {
-                setRate5(false);
-                setRate3(true);
-              } else {
-                setRate4(true);
-                setRate3(true);
-                setRate2(true);
-                setRate1(true);
-              }
-            }}
-            style={{marginHorizontal: Sizes.fixPadding - 5.0}}
-          />
-          <AntDesign
-            name="star"
-            size={22}
-            color={rate5 ? Colors.orangeColor : Colors.shadowColor}
-            onPress={() => {
-              if (rate5) {
-                setRate4(true);
-              } else {
-                setRate5(true);
-                setRate4(true);
-                setRate3(true);
-                setRate2(true);
-                setRate1(true);
-              }
-            }}
-            style={{marginHorizontal: Sizes.fixPadding - 5.0}}
-          />
-        </View>
-      </View>
     );
   }
 
@@ -247,7 +132,7 @@ const RatingScreen = ({navigation}) => {
   }
 };
 
-export default RatingScreen;
+export default CommentScreen;
 
 const styles = StyleSheet.create({
   backToHomeTextStyle: {

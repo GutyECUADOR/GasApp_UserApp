@@ -32,6 +32,7 @@ import LoginScreen from '../screens/auth/loginScreen';
 import RegisterScreen from '../screens/auth/registerScreen';
 import { AuthContext } from '../context/AuthContext';
 import { LoadingScreen } from '../screens/LoadingScreen/LoadingScreen';
+import CommentScreen from '../screens/comment/commentScreen';
 
 LogBox.ignoreAllLogs();
 
@@ -85,6 +86,7 @@ export const Navigator = () => {
               <>
                 <Stack.Screen name="Home" component={DrawerNavigation} options={{ ...TransitionPresets.DefaultTransition }} />
                 <Stack.Screen name="Rating" component={RatingScreen} />
+                <Stack.Screen name="Comment" component={CommentScreen} />
                 <Stack.Screen name="Faqs" component={FaqsScreen} />
                
               </>
