@@ -20,7 +20,7 @@ const RegisterScreen = ({navigation}) => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState('USER_ROLE');
+  const [role, setRole] = useState(1);
   const [password, setPassword] = useState('');
   const [isLoading, setisLoading] = useState(false);
   const [isSuccess, setisSuccess] = useState(false);
