@@ -45,8 +45,6 @@ export const AuthProvider = ({ children }:any) => {
             return dispatch({ type: 'notAuthenticated' })
         }
 
-        console.log('verificatoken', token);
-
         try {
             const { data } = await gasAPI.get('/api/checktoken', {
                 headers: {
@@ -64,7 +62,7 @@ export const AuthProvider = ({ children }:any) => {
                 }
             })
 
-            console.log('checkToken', data);
+            //console.log('checkToken', data);
             
         } catch (error: any) {
             console.log(error.response.data);
