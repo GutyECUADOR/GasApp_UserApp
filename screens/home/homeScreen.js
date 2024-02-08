@@ -83,22 +83,17 @@ const HomeScreen = ({navigation}) => {
     await firestore().collection('pedidos').doc(pedidoID).update({
       status: 'Finalizado'
     }).then(() => {
-      console.log('Pedido finalizado!');
+      console.log('Pedido actualizado a finalizado');
     });
   }
 
-  const deletePedidoDelivery = async () => {
-
-    firestoreRef.current();   
-
-    // Register on DB Laravel
-    
+  const deletePedidoDelivery = async (firestoreID) => {
     await firestore()
       .collection('pedidos')
-      .doc(locationState.pedidoActivoID)
+      .doc(firestoreID)
       .delete()
       .then(() => {
-        console.log(`Pedido finalizado ${locationState.pedidoActivoID}`);
+        console.log(`Pedido Eliminado: ${firestoreID}`);
       });
 
       await registerPedidoFinalizado({
@@ -195,7 +190,7 @@ const HomeScreen = ({navigation}) => {
     }
   }, [locationState.pedidoActivoID]) */
 
-  const openWatchPedidoActivo = (pedidoActivoID) => {    
+  const openWatchPedidoActivo = (pedidoActivoID) => {  
     const subscriber = firestore()
       .collection('pedidos')
       .doc(pedidoActivoID)
@@ -224,7 +219,7 @@ const HomeScreen = ({navigation}) => {
               Alert.alert('Pedido finalizado', 'El delivery se ha marcado como finalizado. Gracias por utilizar la app', [ {
                 text: 'Aceptar',
                 onPress: async () => {
-                  await deletePedidoDelivery();
+                  await deletePedidoDelivery(pedidoActivoID);
                 },
               }]);
               break;
@@ -236,11 +231,6 @@ const HomeScreen = ({navigation}) => {
     firestoreRef.current = subscriber;
   }
   
-  const closeWatchPedidoActivo = () => {    
-    firestoreRef.current();        
-  }
-
-
   // Obtener dirección de las coordenadas
   useEffect(() => {
     getAddress();
@@ -594,7 +584,7 @@ const HomeScreen = ({navigation}) => {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={ async () => {
-            await deletePedidoDelivery();
+            await deletePedidoDelivery(locationState.pedidoActivoID);
           }}
           style={{...styles.buttonStyleSearching}}>
           <Text numberOfLines={1} style={{...Fonts.whiteColor18Bold}}>
