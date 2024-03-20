@@ -16,7 +16,7 @@ import { AuthContext } from '../../context/AuthContext';
 
 const RatingScreen = ({navigation}) => {
 
-  const { user, sendComentario } = useContext(AuthContext)
+  const { user, sendRating } = useContext(AuthContext)
   const [rate1, setRate1] = useState(true);
   const [rate2, setRate2] = useState(true);
   const [rate3, setRate3] = useState(true);
@@ -59,9 +59,23 @@ const RatingScreen = ({navigation}) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => {
-          if (comentario.length > 0) {
-            sendComentario({'id_usuario':user.id, comentario});
+          let rating;
+          if (rate5) {
+            rating = 5;
+          }else if (rate4)
+          {
+            rating = 4;
+          }else if (rate3)
+          {
+            rating = 3;
+          }else if (rate2)
+          {
+            rating = 2;
+          }else {
+            rating = 1;
           }
+          
+          sendRating({'id_usuario':user.id, rating});
           navigation.push('Home');
         }}
         style={styles.buttonStyle}>

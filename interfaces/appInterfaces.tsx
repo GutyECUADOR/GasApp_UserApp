@@ -23,6 +23,10 @@ export interface ComentarioResponse {
     message: string;
 }
 
+export interface CalificacionResponse {
+    message: string;
+}
+
 export interface PedidoResponse {
     message: string;
 }
@@ -42,6 +46,11 @@ export interface User {
 export interface Comentario {
     id_usuario: string,
     comentario: string
+}
+
+export interface Calificacion {
+    id_usuario: string,
+    rating: number
 }
 
 export interface PedidoData {

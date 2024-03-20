@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useEffect} from 'react';
-import { LoginData, RegisterData, LoginResponse, User, Comentario, ComentarioResponse, PedidoData, PedidoResponse } from '../interfaces/appInterfaces';
+import { LoginData, RegisterData, LoginResponse, User, Comentario, ComentarioResponse, PedidoData, PedidoResponse, Calificacion, CalificacionResponse } from '../interfaces/appInterfaces';
 import { authReducer, AuthState } from './authReducer';
 import gasAPI from '../api/gasAPI';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,6 +17,7 @@ type AuthContextProps = {
     removeRegisterError : () => void;
     registerPedidoFinalizado : ( pedidoData: PedidoData) => Promise<void>;
     sendComentario : ( comentario: Comentario) => Promise<void>;
+    sendRating : ( calificacion: Calificacion) => Promise<void>;
 }
 
 const authInitialState: AuthState = {
@@ -81,6 +82,7 @@ export const AuthProvider = ({ children }:any) => {
     const signIn = async ( {email, password}: LoginData) => {
         
         try {
+            console.log('login');
             const { data } = await gasAPI.post<LoginResponse>('/api/login', {email, password }, {
                 headers: { 
                     'Accept': 'application/json', 
@@ -193,6 +195,30 @@ export const AuthProvider = ({ children }:any) => {
 
     };
 
+    const sendRating = async ( {id_usuario, rating}: Calificacion) => {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+            return dispatch({ type: 'notAuthenticated' })
+        }
+        
+        try {
+            const { data } = await gasAPI.post<CalificacionResponse>('/api/rating', {id_usuario, rating}, {
+                headers: {
+                    'Accept': 'application/json', 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                } 
+                });
+            
+           
+            console.log(data);
+
+        } catch (error: any) {
+            console.log(error.response.data);
+        }
+
+    };
+
 
     return (
         <AuthContext.Provider value={{
@@ -203,7 +229,8 @@ export const AuthProvider = ({ children }:any) => {
             removeRegisterError,
             removeError,
             registerPedidoFinalizado,
-            sendComentario
+            sendComentario,
+            sendRating
         }}>
             { children }
         </AuthContext.Provider>
